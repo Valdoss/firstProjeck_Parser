@@ -10,7 +10,7 @@ import time
 url = "https://brain.com.ua/ukr/category/Marshrutyzatory-c1333-143/"
 keywords = ["Принтер етикеток і чеків", "Принтер етикеток","Детектор валют", "Принтер linerless етикеток","Принтер браслетів","Принтер-аплікатор","Детектор валют","Детектор валюти","Лічильник банкнот","Сортувальник банкнот",
             'Принтер чеків', 'Термопринтер','Портативний принтер','POS-принтер','POS-прінтер', 'Настольный принтер этикеток','Промышленный принтер этикеток','Мобильный принтер', 'Мобильный принтер','Принтер этикеток','Принтер чеков и этикеток',
-            'Принтер чеков', 'Счетчик банкнот','Термотрансферний принтер','Мобільний принтер для друку етикетки та чеків', 'Принтер для друку етикеток і штрих-коду']
+            'Принтер чеков', 'Счетчик банкнот','Термотрансферний принтер','Мобільний принтер для друку етикетки та чеків', 'Принтер для друку етикеток і штрих-коду',  'Принтер мобільний']
 firm = ["Godex","Zebra", "NRJ", "HPRT", 'BIXOLON']
 data = []
 start_time = time.time()
@@ -562,13 +562,21 @@ rozetka = [
     'https://rozetka.com.ua/ua/hprt_9554/p11245658/',
     'https://rozetka.com.ua/ua/252787381/p252787381/'
 ]
-for url in rozetka:
-    try:
-        response = requests.get(url, timeout=20, headers={'User-agent': 'your bot 0.1'})
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, 'lxml')
-        name_link = soup.find('div', class_="product__heading")
-        name = name_link.text.strip()
+for p in range(1,2):
+    url = f"https://rozetka.com.ua/ua/printery-etiketok/c4625268/producer=bixolon,godex,hprt,zebra1;seller=rozetka/"
+    r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
+    soup = BeautifulSoup(r.text, 'lxml')
+    n_elemnts = soup.findAll('li',class_="catalog-grid__cell catalog-grid__cell_type_slim ng-star-inserted")
+    for element in n_elemnts:
+        '''name =  element.find('span', class_="goods-tile__title").find('span').text.strip()'''
+        try:
+            name = element.find('span', class_="goods-tile__title").text.strip()
+        except:
+            name='-'
+        try:
+            price = element.find('span', class_="goods-tile__price-value").text.strip()
+        except:
+            price = '-'
         for key in keywords:
             if key.lower() in name.lower():
                 kategoria = key
@@ -595,15 +603,7 @@ for url in rozetka:
             price = soup.find('p', class_="product-price__small ng-star-inserted").text.strip()
         except:
             ac_price = "-"
-        try:
-            price_element = soup.find('p', class_="product-price__big product-price__big-color-red")
-            ac_price = price_element.text.strip()
-        except:
-            price_element = soup.find('p', class_="product-price__big")
-            if price_element:
-                price = price_element.text.strip()
-            else:
-                price = "N/A"
+        
         s_name = 'rozetka'
         parts = remaining_name.split(" ")
         mod = parts[0]
@@ -644,59 +644,169 @@ for url in rozetka:
         # Объединить буквы в строку
         tp = "".join(letters)
         data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
-        continue
-epicentr = [
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-g500-u.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-g500-ues.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-g530-u.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-g530-ues.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-dt2us.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-dt2x.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-dt4c.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-dt4x.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-mx30i-bt-wi-fi.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-rt863i.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-ez2250i-6594.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-ez2350i.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-i-chekiv-godex-mx30-bt.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-godex-mx30i-bt.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-rt200.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-zx1200i.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-zx1300i.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-zx1600i.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-godex-zx420i.html',
-'https://epicentrk.ua/ua/shop/mplc-printer-etiketok-zebra-zd411-1ee8eaa2-f383-6e90-8270-e960897909a0.html',
-'https://epicentrk.ua/ua/shop/prynter-etyketok-i-chekiv-godex-mx20.html',
-'https://epicentrk.ua/ua/shop/detektor-valiut-nrj-al-9-uv.html',
-'https://epicentrk.ua/ua/shop/detektor-valiut-nrj-al-9-uv-z-akumuliatorom.html',
-'https://epicentrk.ua/ua/shop/detektor-valiut-nrj-al-11-uv-mg-z-akumuliatorom.html',
-'https://epicentrk.ua/ua/shop/detektor-valiut-nrj-al-11-uv-mg.html',
-'https://epicentrk.ua/ua/shop/lichylnyk-banknot-nrj-al-5100-uv.html',
-'https://epicentrk.ua/ua/shop/lichylnyk-banknot-al-7200-uv-mg.html',
-'https://epicentrk.ua/ua/shop/sortuvalnyk-banknot-nrj-al-955-uv-mg-ir.html',
-'https://epicentrk.ua/ua/shop/lichylnyk-banknot-nrj-al-185-uv-mg-ir.html',
-'https://epicentrk.ua/ua/shop/lichylnyk-banknot-nrj-al-6600-uv-mg.html',
-'https://epicentrk.ua/ua/shop/printer-etiketok-bixolon-xd3-40dk.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-hprt-lpq58.html',
-'https://epicentrk.ua/ua/shop/mplc-printer-etiketok-ta-cekiv-hprt-lpq58-1ee8ade5-1cca-6790-b8e2-e52023cea69a.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-bixolon-spp-c200ik-mobilnyi.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-bixolon-spp-c300ik-bluetooth.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-bixolon-srp-350iii.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-bixolon-srp-e300-esk.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-bixolon-srp-q200ek.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-bixolon-srp-q200ewdk.html',
-'https://epicentrk.ua/ua/shop/termoprynter-bixolon-srp-q200sk-usb-serial.html',
-'https://epicentrk.ua/ua/shop/printer-chekov-hprt-ppt2a-usb-serial-10898.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-hprt-tp585-usb-bluetooth.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-hprt-tp585.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-hprt-tp808-usb-ethernet-serial.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-hprt-tp809-usb-ethernet-serial.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-hprt-tp80k.html',
-'https://epicentrk.ua/ua/shop/prynter-chekiv-hprt-tp80k-l-usb-ethernet.html',
-'https://epicentrk.ua/ua/shop/printer-chekov-hprt-ppt2a-usb-serial-10898.html'
-]
+        
+for p in range(1,2):
+    url = f"https://rozetka.com.ua/ua/counters_and_currency_detectors/c754404/producer=nrj;seller=rozetka;state=new/"
+    r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
+    soup = BeautifulSoup(r.text, 'lxml')
+    n_elemnts = soup.findAll('li',class_="catalog-grid__cell catalog-grid__cell_type_slim ng-star-inserted")
+    for element in n_elemnts:
+        '''name =  element.find('span', class_="goods-tile__title").find('span').text.strip()'''
+        try:
+            name = element.find('span', class_="goods-tile__title").text.strip()
+        except:
+            name='-'
+        try:
+            price = element.find('span', class_="goods-tile__price-value").text.strip()
+        except:
+            price = '-'
+        for key in keywords:
+            if key.lower() in name.lower():
+                kategoria = key
+                break  # Exit the loop after finding a match
+        else:  # No match found, set category to empty
+            kategoria = ""
+        split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
+        if len(split_name) > 1:
+            remaining_name = split_name[1].strip()
+        else:
+            remaining_name = name
+        markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
+        if len(markat) > 1:
+            remaining_name = markat[1].strip()
+        else:      
+            marka = remaining_name
+        for key in firm:
+            if key.lower() in name.lower():
+                marka = key
+                break  # Exit the loop after finding a match
+            else:  # No match found, set category to empty
+                marka = ""
+        try:
+            price = soup.find('p', class_="product-price__small ng-star-inserted").text.strip()
+        except:
+            ac_price = "-"
+        s_name = 'rozetka'
+        parts = remaining_name.split(" ")
+        mod = parts[0]
+        if remaining_name == mod:
+            remaining_name 
+        l1 = remaining_name.split()
+        remaining_name = " ".join(l1[1:])
+        dpi = ""
+        try:
+            # Разделить строку по "dpi"
+            parts = remaining_name.lower().split("dpi")
+                # Извлечь все после dpi
+            remaining_name = parts[1].strip()  # Удаление пробелов
+                # Извлечь все до dpi и сам dpi
+            dpi = parts[0] 
+        except:
+            d  = remaining_name
+        dpi = dpi.replace("(", "")
+        index = remaining_name.find(")")
+        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
+        try:
+                if remaining_name[0] == ",":
+                # Удалить первый символ
+                    remaining_name = remaining_name[1:]
+        except:
+            d = remaining_name
+        remaining_name = remaining_name.strip()
+        numbers = re.findall(r"\d+", price)
+        price = "".join(numbers)
+        numbers1 = re.findall(r"\d+", ac_price)
+        ac_price = "".join(numbers1)
+            # Найти все цифры
+        digits = re.findall(r"\d+", dpi)
+        # Найти все буквы
+        letters = re.findall(r"[a-zA-Z]", dpi)
+        # Объединить цифры в строку
+        dpi = "".join(digits)
+        # Объединить буквы в строку
+        tp = "".join(letters)
+        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+for p in range(1,2):
+    url = f"https://rozetka.com.ua/ua/pos-printery/c4625319/producer=hprt;seller=rozetka/"
+    r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
+    soup = BeautifulSoup(r.text, 'lxml')
+    n_elemnts = soup.findAll('li',class_="catalog-grid__cell catalog-grid__cell_type_slim ng-star-inserted")
+    for element in n_elemnts:
+        '''name =  element.find('span', class_="goods-tile__title").find('span').text.strip()'''
+        try:
+            name = element.find('span', class_="goods-tile__title").text.strip()
+        except:
+            name='-'
+        try:
+            price = element.find('span', class_="goods-tile__price-value").text.strip()
+        except:
+            price = '-'
+        for key in keywords:
+            if key.lower() in name.lower():
+                kategoria = key
+                break  # Exit the loop after finding a match
+        else:  # No match found, set category to empty
+            kategoria = ""
+        split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
+        if len(split_name) > 1:
+            remaining_name = split_name[1].strip()
+        else:
+            remaining_name = name
+        markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
+        if len(markat) > 1:
+            remaining_name = markat[1].strip()
+        else:      
+            marka = remaining_name
+        for key in firm:
+            if key.lower() in name.lower():
+                marka = key
+                break  # Exit the loop after finding a match
+            else:  # No match found, set category to empty
+                marka = ""
+        try:
+            price = soup.find('p', class_="product-price__small ng-star-inserted").text.strip()
+        except:
+            ac_price = "-"
+        s_name = 'rozetka'
+        parts = remaining_name.split(" ")
+        mod = parts[0]
+        if remaining_name == mod:
+            remaining_name 
+        l1 = remaining_name.split()
+        remaining_name = " ".join(l1[1:])
+        dpi = ""
+        try:
+            # Разделить строку по "dpi"
+            parts = remaining_name.lower().split("dpi")
+                # Извлечь все после dpi
+            remaining_name = parts[1].strip()  # Удаление пробелов
+                # Извлечь все до dpi и сам dpi
+            dpi = parts[0] 
+        except:
+            d  = remaining_name
+        dpi = dpi.replace("(", "")
+        index = remaining_name.find(")")
+        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
+        try:
+                if remaining_name[0] == ",":
+                # Удалить первый символ
+                    remaining_name = remaining_name[1:]
+        except:
+            d = remaining_name
+        remaining_name = remaining_name.strip()
+        numbers = re.findall(r"\d+", price)
+        price = "".join(numbers)
+        numbers1 = re.findall(r"\d+", ac_price)
+        ac_price = "".join(numbers1)
+            # Найти все цифры
+        digits = re.findall(r"\d+", dpi)
+        # Найти все буквы
+        letters = re.findall(r"[a-zA-Z]", dpi)
+        # Объединить цифры в строку
+        dpi = "".join(digits)
+        # Объединить буквы в строку
+        tp = "".join(letters)
+        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
 
 start_time = time.time()
 for p in range(1,3) :
