@@ -10,11 +10,13 @@ import time
 url = "https://brain.com.ua/ukr/category/Marshrutyzatory-c1333-143/"
 keywords = ["Принтер етикеток і чеків", "Принтер етикеток","Детектор валют", "Принтер linerless етикеток","Принтер браслетів","Принтер-аплікатор","Детектор валют","Детектор валюти","Лічильник банкнот","Сортувальник банкнот",
             'Принтер чеків', 'Термопринтер','Портативний принтер','POS-принтер','POS-прінтер', 'Настольный принтер этикеток','Промышленный принтер этикеток','Мобильный принтер', 'Мобильный принтер','Принтер этикеток','Принтер чеков и этикеток',
-            'Принтер чеков', 'Счетчик банкнот','Термотрансферний принтер','Мобільний принтер для друку етикетки та чеків', 'Принтер для друку етикеток і штрих-коду',  'Принтер мобільний']
+            'Принтер чеков', 'Счетчик банкнот','Термотрансферний принтер','Мобільний принтер для друку етикетки та чеків', 'Принтер для друку етикеток і штрих-коду',  'Принтер мобільний',
+            'Принтер пластикових карток']
 firm = ["Godex","Zebra", "NRJ", "HPRT", 'BIXOLON']
 data = []
 start_time = time.time()
 for p in range(1, 5):
+    # Обладнання для друку етикеток Reef 
     print(p)
     url = f"https://shop.reef.ua/ua/obladnannya-dlya-druku-etiketok/mfp/20-,%D0%9C%D0%BE%D0%B1%D1%96%D0%BB%D1%8C%D0%BD%D0%B8%D0%B9,%D0%9D%D0%B0%D1%81%D1%82%D1%96%D0%BB%D1%8C%D0%BD%D0%B8%D0%B9,%D0%9F%D1%80%D0%BE%D0%BC%D0%B8%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D0%B9/manufacturers,bixolon,godex,hprt,zebra-motorola-symbol2/page-{p}/"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -92,7 +94,7 @@ for p in range(1, 5):
         # Объединить буквы в строку
         tp = "".join(letters)
         data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
-for p in range(1, 3):
+for p in range(1, 3): #Обладнання для друку чеків
     print(p)
     url = f"https://shop.reef.ua/ua/obladnannya-dlya-druku-chekiv/mfp/20-,%D0%9C%D0%BE%D0%B1%D1%96%D0%BB%D1%8C%D0%BD%D0%B8%D0%B9,%D0%9D%D0%B0%D1%81%D1%82%D1%96%D0%BB%D1%8C%D0%BD%D0%B8%D0%B9/manufacturers,bixolon,godex,hprt/page-{p}/"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -170,7 +172,7 @@ for p in range(1, 3):
         # Объединить буквы в строку
         tp = "".join(letters)
         data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
-for p in range(1, 2):
+for p in range(1, 2): #Банківське обладнання
     print(p)
     url = f"https://shop.reef.ua/ua/bankivske-obladnannia/mfp/manufacturers,nrj/"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -603,7 +605,6 @@ for p in range(1,2):
             price = soup.find('p', class_="product-price__small ng-star-inserted").text.strip()
         except:
             ac_price = "-"
-        
         s_name = 'rozetka'
         parts = remaining_name.split(" ")
         mod = parts[0]
@@ -644,7 +645,6 @@ for p in range(1,2):
         # Объединить буквы в строку
         tp = "".join(letters)
         data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
-        
 for p in range(1,2):
     url = f"https://rozetka.com.ua/ua/counters_and_currency_detectors/c754404/producer=nrj;seller=rozetka;state=new/"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -1606,54 +1606,6 @@ for url in posttorg:
     tp = "".join(letters)
     ac_price = ''
     data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
-dpi_600 = [
-    'https://600dpi.com.ua/printer-etiketok-godex-g500',
-    'https://600dpi.com.ua/printer-etiketok-godex-g530',
-    'https://600dpi.com.ua/printer-etiketok-godex-dt2x',
-    'https://600dpi.com.ua/printer-etiketok-godex-dt4x',
-    'https://600dpi.com.ua/printer-etiketok-godex-rt200i',
-    'https://600dpi.com.ua/printer-etiketok-godex-rt863i',
-    'https://600dpi.com.ua/mobilnyi-printer-chekov-etiketok-godex-mx30i',
-    'https://600dpi.com.ua/printer-etiketok-godex-rt200',
-    'https://600dpi.com.ua/printer-etiketok-godex-zx1200i',
-    'https://600dpi.com.ua/printer-etiketok-godex-zx1300i',
-    'https://600dpi.com.ua/shop/search?text=GoDEX+ZX1600i',
-    'https://600dpi.com.ua/printer-etiketok-godex-zx420i',
-    'https://600dpi.com.ua/printer-etiketok-godex-rt730i',
-    'https://600dpi.com.ua/printer-etiketok-godex-bp520l',
-    'https://600dpi.com.ua/printer-etiketok-godex-ez120',
-    'https://600dpi.com.ua/printer-etiketok-godex-ez130',
-    'https://600dpi.com.ua/printer-etiketok-godex-ez-6300-plus',
-    'https://600dpi.com.ua/printer-etiketok-godex-hd830i',
-    'https://600dpi.com.ua/printer-etiketok-godex-zx1200xi',
-    'https://600dpi.com.ua/printer-etiketok-godex-zx430i',
-    'https://600dpi.com.ua/mobilnyi-printer-chekov-etiketok-godex-mx20',
-    'https://600dpi.com.ua/sortirovshchik-banknot-nrj-al-955-uv-mg-ir',
-    'https://600dpi.com.ua/printer-etiketok-bixolon-slp-dl410c',
-    'https://600dpi.com.ua/printer-chekov-etiketok-bixolon-srp-s300l',
-    'https://600dpi.com.ua/printer-etiketok-hprt-ht100',
-    'https://600dpi.com.ua/printer-etiketok-hprt-ht300',
-    'https://600dpi.com.ua/printer-chekov-etiketok-hprt-lpq58',
-    'https://600dpi.com.ua/printer-chekov-etiketok-hprt-lpq80',
-    'https://600dpi.com.ua/mobilnyi-printer-chekov-bixolon-spp-r310',
-    'https://600dpi.com.ua/mobilnyi-printer-chekov-bixolon-spp-r410',
-    'https://600dpi.com.ua/printer-chekov-bixolon-srp-350iii',
-    'https://600dpi.com.ua/printer-chekov-bixolon-srp-380',
-    'https://600dpi.com.ua/printer-chekov-bixolon-srp-e300',
-    'https://600dpi.com.ua/mobilnyi-printer-chekov-hprt-hm-e300',
-    'https://600dpi.com.ua/mobilnyi-printer-chekov-hprt-hm-e200',
-    'https://600dpi.com.ua/mobilnyi-printer-chekov-hprt-mpt2',
-    'https://600dpi.com.ua/printer-chekov-hprt-ppt2-a',
-    'https://600dpi.com.ua/printer-chekov-hprt-tp806',
-    'https://600dpi.com.ua/printer-chekov-hprt-tp808',
-    'https://600dpi.com.ua/printer-chekov-hprt-tp809',
-    'https://600dpi.com.ua/mobilnyi-printer-chekov-bixolon-spp-r200iii',
-    'https://600dpi.com.ua/mobilnyi-printer-chekov-bixolon-spp-r310',
-    'https://600dpi.com.ua/mobilnyi-printer-chekov-bixolon-spp-r410',
-    'https://600dpi.com.ua/printer-chekov-bixolon-srp-380',
-    'https://600dpi.com.ua/mobilnyi-printer-chekov-hprt-mpt3',
-    'https://600dpi.com.ua/printer-chekov-hprt-tp805l',
-]
 for url in dpi_600:
     try:
         response = requests.get(url, timeout=20, headers={'User-agent': 'your bot 0.1'})
