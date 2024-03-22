@@ -15,90 +15,412 @@ keywords = ["Принтер етикеток і чеків", "Принтер е�
 firm = ["Godex","Zebra", "NRJ", "HPRT", 'BIXOLON']
 data = []
 start_time = time.time()
-url = f"https://rozetka.com.ua/ua/printery-etiketok/c4625268/producer=bixolon,godex,hprt,zebra1;seller=rozetka/"
+technologic = [
+    'https://technologic.ua/cat/nastolnye-printery-etiketok/filter-brands-is-godex-taiwan-or-hprt/',
+    'https://technologic.ua/cat/promyshlennye-printery-etiketok/filter-brands-is-godex-taiwan/',
+    'https://technologic.ua/cat/stacionarnye-printery-chekov/filter-brands-is-hprt/',
+    'https://technologic.ua/cat/schetchiki-banknot/filter-brands-is-nrj/'
+]
+for url in technologic:
 
-for p in range(1,2):  # Настольные принтеры этикеток postorg
-    url = f"https://gipercenter.kiev.ua/ua/g97469047-nastolnye?bss0=25916&bss0=202701&presence_available=true"
-    r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
-    soup = BeautifulSoup(r.text, 'lxml')
-    ac_price = ''
-    n_elemnts = soup.findAll('div', class_="Block__ui_margin-top_xs--JYF_i Block__ui_margin-right_xs--zwvwn Block__ui_margin-bottom_xs--JVahY Block__ui_margin-left_xs--S129n")
-    for element in n_elemnts:
-        try:
-            ac_price  = element.find('span', class_="Text__ui_text_size_xl--hiLG7").text.strip()
-        except:
-            ac_price = ''
-        try:
-            price = element.find('p', class_="Text__ui_text_size_xs--GXoZP Text__ui_text_decoration_line-through--lN0mm").text.strip()
-        except:
-             price = ''
-        try:
-            name = element.find('p', class_="Item__title--g7_es").text.strip()  
-        except:
-            name = ''
-        for key in keywords:
-            if key.lower() in name.lower():
-                kategoria = key
-                break  # Exit the loop after finding a match
-        else:  # No match found, set category to empty
-            kategoria = ""
-        split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
-        if len(split_name) > 1:
-            remaining_name = split_name[1].strip()
-        else:
-            remaining_name = name
-        markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
-        if len(markat) > 1:
-            remaining_name = markat[1].strip()
-        else:      
-            marka = remaining_name
-        for key in firm:
-            if key.lower() in name.lower():
-                marka = key
-                # Exit the loop after finding a match
+    for p in range(1,2):  # Настольные принтеры этикеток technologic
+    
+        r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
+        soup = BeautifulSoup(r.text, 'lxml')
+        ac_price = ''
+        n_elemnts = soup.findAll('div', class_="product-card")
+        for element in n_elemnts:
+            try:
+                name = element.find('h3', class_="product-card--name").text.strip()
+            except:
+                name='-'
+            try:
+                price = element.find('div', class_="product-card--price-actual").text.strip()
+            except:
+                price = '-'
+            for key in keywords:
+                if key.lower() in name.lower():
+                    kategoria = key
+                    break  # Exit the loop after finding a match
             else:  # No match found, set category to empty
-                marka = ""
-        s_name = 'gipercenter'
-        parts = remaining_name.split(" ")
-        mod = parts[0]
-        if remaining_name == mod:
-            remaining_name 
-        l1 = remaining_name.split()
-        remaining_name = " ".join(l1[1:])
-        dpi = ""
-        try:
-            # Разделить строку по "dpi"
-            parts = remaining_name.lower().split("dpi")
-                # Извлечь все после dpi
-            remaining_name = parts[1].strip()  # Удаление пробелов
-                # Извлечь все до dpi и сам dpi
-            dpi = parts[0] 
-        except:
-            d  = remaining_name
-        dpi = dpi.replace("(", "")
-        index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
-        try:
-                if remaining_name[0] == ",":
-                # Удалить первый символ
-                    remaining_name = remaining_name[1:]
-        except:
-            d = remaining_name
-        remaining_name = remaining_name.strip()
-        numbers = re.findall(r"\d+", price)
-        price = "".join(numbers)
-        numbers1 = re.findall(r"\d+", ac_price)
-        ac_price = "".join(numbers1)
-            # Найти все цифры
-        digits = re.findall(r"\d+", dpi)
-        # Найти все буквы
-        letters = re.findall(r"[a-zA-Z]", dpi)
-        # Объединить цифры в строку
-        dpi = "".join(digits)
-        # Объединить буквы в строку
-        tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
-
+                kategoria = ""
+            split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
+            if len(split_name) > 1:
+                remaining_name = split_name[1].strip()
+            else:
+                remaining_name = name
+            markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
+            if len(markat) > 1:
+                remaining_name = markat[1].strip()
+            else:      
+                marka = remaining_name
+            for key in firm:
+                if key.lower() in name.lower():
+                    marka = key
+                    break  # Exit the loop after finding a match
+                else:  # No match found, set category to empty
+                    marka = ""
+            s_name = 'technologic'
+            parts = remaining_name.split(" ")
+            mod = parts[0]
+            if remaining_name == mod:
+                remaining_name 
+            l1 = remaining_name.split()
+            remaining_name = " ".join(l1[1:])
+            dpi = ""
+            try:
+                # Разделить строку по "dpi"
+                parts = remaining_name.lower().split("dpi")
+                    # Извлечь все после dpi
+                remaining_name = parts[1].strip()  # Удаление пробелов
+                    # Извлечь все до dpi и сам dpi
+                dpi = parts[0] 
+            except:
+                d  = remaining_name
+            dpi = dpi.replace("(", "")
+            index = remaining_name.find(")")
+            remaining_name = remaining_name[:index] + remaining_name[index + 1:]
+            try:
+                    if remaining_name[0] == ",":
+                    # Удалить первый символ
+                        remaining_name = remaining_name[1:]
+            except:
+                d = remaining_name
+            remaining_name = remaining_name.strip()
+            numbers = re.findall(r"\d+", price)
+            price = "".join(numbers)
+            numbers1 = re.findall(r"\d+", ac_price)
+            ac_price = "".join(numbers1)
+                # Найти все цифры
+            digits = re.findall(r"\d+", dpi)
+            # Найти все буквы
+            letters = re.findall(r"[a-zA-Z]", dpi)
+            # Объединить цифры в строку
+            dpi = "".join(digits)
+            # Объединить буквы в строку
+            tp = "".join(letters)
+            data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+            
+'''for p in range(1,2):  #  Принтер Чеків-етикеток этикеток postorg
+        url = f"https://postorg.com.ua/category/chekov-etiketok/?proizvoditel%5B%5D=275"
+        r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
+        soup = BeautifulSoup(r.text, 'lxml')
+        ac_price = ''
+        n_elemnts = soup.findAll('div', class_="col-lg-12 flexdiscount-product-wrap 3")
+        for element in n_elemnts:
+            try:
+                name = element.find('div', class_="line-product-name").text.strip()
+            except:
+                name='-'
+            try:
+                price = element.find('div', class_="price").text.strip()
+            except:
+                price = '-'
+            
+            for key in keywords:
+                if key.lower() in name.lower():
+                    kategoria = key
+                    break  # Exit the loop after finding a match
+            else:  # No match found, set category to empty
+                kategoria = ""
+            split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
+            if len(split_name) > 1:
+                remaining_name = split_name[1].strip()
+            else:
+                remaining_name = name
+            markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
+            if len(markat) > 1:
+                remaining_name = markat[1].strip()
+            else:      
+                marka = remaining_name
+            for key in firm:
+                if key.lower() in name.lower():
+                    marka = key
+                    break  # Exit the loop after finding a match
+                else:  # No match found, set category to empty
+                    marka = ""
+            s_name = 'postorg'
+            parts = remaining_name.split(" ")
+            mod = parts[0]
+            if remaining_name == mod:
+                remaining_name 
+            l1 = remaining_name.split()
+            remaining_name = " ".join(l1[1:])
+            dpi = ""
+            try:
+                # Разделить строку по "dpi"
+                parts = remaining_name.lower().split("dpi")
+                    # Извлечь все после dpi
+                remaining_name = parts[1].strip()  # Удаление пробелов
+                    # Извлечь все до dpi и сам dpi
+                dpi = parts[0] 
+            except:
+                d  = remaining_name
+            dpi = dpi.replace("(", "")
+            index = remaining_name.find(")")
+            remaining_name = remaining_name[:index] + remaining_name[index + 1:]
+            try:
+                    if remaining_name[0] == ",":
+                    # Удалить первый символ
+                        remaining_name = remaining_name[1:]
+            except:
+                d = remaining_name
+            remaining_name = remaining_name.strip()
+            # price = price.split(".")
+            price = price[:price.find(".")]
+            numbers = re.findall(r"\d+", price)
+            price = "".join(numbers)
+            numbers1 = re.findall(r"\d+", ac_price)
+            ac_price = "".join(numbers1)
+                # Найти все цифры
+            digits = re.findall(r"\d+", dpi)
+            # Найти все буквы
+            letters = re.findall(r"[a-zA-Z]", dpi)
+            # Объединить цифры в строку
+            dpi = "".join(digits)
+            # Объединить буквы в строку
+            tp = "".join(letters)
+            data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+    for p in range(1,2):  # Промышленный принтер этикеток postorg
+        url = f"https://postorg.com.ua/category/promyshlennye/?proizvoditel%5B%5D=233&proizvoditel%5B%5D=268"
+        r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
+        soup = BeautifulSoup(r.text, 'lxml')
+        ac_price = ''
+        n_elemnts = soup.findAll('div', class_="col-lg-12 flexdiscount-product-wrap 3")
+        for element in n_elemnts:
+            try:
+                name = element.find('div', class_="line-product-name").text.strip()
+            except:
+                name='-'
+            try:
+                price = element.find('div', class_="price").text.strip()
+            except:
+                price = '-'
+            
+            for key in keywords:
+                if key.lower() in name.lower():
+                    kategoria = key
+                    break  # Exit the loop after finding a match
+            else:  # No match found, set category to empty
+                kategoria = ""
+            split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
+            if len(split_name) > 1:
+                remaining_name = split_name[1].strip()
+            else:
+                remaining_name = name
+            markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
+            if len(markat) > 1:
+                remaining_name = markat[1].strip()
+            else:      
+                marka = remaining_name
+            for key in firm:
+                if key.lower() in name.lower():
+                    marka = key
+                    break  # Exit the loop after finding a match
+                else:  # No match found, set category to empty
+                    marka = ""
+            s_name = 'postorg'
+            parts = remaining_name.split(" ")
+            mod = parts[0]
+            if remaining_name == mod:
+                remaining_name 
+            l1 = remaining_name.split()
+            remaining_name = " ".join(l1[1:])
+            dpi = ""
+            try:
+                # Разделить строку по "dpi"
+                parts = remaining_name.lower().split("dpi")
+                    # Извлечь все после dpi
+                remaining_name = parts[1].strip()  # Удаление пробелов
+                    # Извлечь все до dpi и сам dpi
+                dpi = parts[0] 
+            except:
+                d  = remaining_name
+            dpi = dpi.replace("(", "")
+            index = remaining_name.find(")")
+            remaining_name = remaining_name[:index] + remaining_name[index + 1:]
+            try:
+                    if remaining_name[0] == ",":
+                    # Удалить первый символ
+                        remaining_name = remaining_name[1:]
+            except:
+                d = remaining_name
+            remaining_name = remaining_name.strip()
+            # price = price.split(".")
+            price = price[:price.find(".")]
+            numbers = re.findall(r"\d+", price)
+            price = "".join(numbers)
+            numbers1 = re.findall(r"\d+", ac_price)
+            ac_price = "".join(numbers1)
+                # Найти все цифры
+            digits = re.findall(r"\d+", dpi)
+            # Найти все буквы
+            letters = re.findall(r"[a-zA-Z]", dpi)
+            # Объединить цифры в строку
+            dpi = "".join(digits)
+            # Объединить буквы в строку
+            tp = "".join(letters)
+            data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+    for p in range(1,2):  # Настільні принтери чеків postorg 
+        url = f"https://postorg.com.ua/category/nastolnye-printery-chekov/?proizvoditel%5B%5D=233&proizvoditel%5B%5D=275"
+        r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
+        soup = BeautifulSoup(r.text, 'lxml')
+        ac_price = ''
+        n_elemnts = soup.findAll('div', class_="col-lg-12 flexdiscount-product-wrap 3")
+        for element in n_elemnts:
+            try:
+                name = element.find('div', class_="line-product-name").text.strip()
+            except:
+                name='-'
+            try:
+                price = element.find('div', class_="price").text.strip()
+            except:
+                price = '-'
+            
+            for key in keywords:
+                if key.lower() in name.lower():
+                    kategoria = key
+                    break  # Exit the loop after finding a match
+            else:  # No match found, set category to empty
+                kategoria = ""
+            split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
+            if len(split_name) > 1:
+                remaining_name = split_name[1].strip()
+            else:
+                remaining_name = name
+            markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
+            if len(markat) > 1:
+                remaining_name = markat[1].strip()
+            else:      
+                marka = remaining_name
+            for key in firm:
+                if key.lower() in name.lower():
+                    marka = key
+                    break  # Exit the loop after finding a match
+                else:  # No match found, set category to empty
+                    marka = ""
+            s_name = 'postorg'
+            parts = remaining_name.split(" ")
+            mod = parts[0]
+            if remaining_name == mod:
+                remaining_name 
+            l1 = remaining_name.split()
+            remaining_name = " ".join(l1[1:])
+            dpi = ""
+            try:
+                # Разделить строку по "dpi"
+                parts = remaining_name.lower().split("dpi")
+                    # Извлечь все после dpi
+                remaining_name = parts[1].strip()  # Удаление пробелов
+                    # Извлечь все до dpi и сам dpi
+                dpi = parts[0] 
+            except:
+                d  = remaining_name
+            dpi = dpi.replace("(", "")
+            index = remaining_name.find(")")
+            remaining_name = remaining_name[:index] + remaining_name[index + 1:]
+            try:
+                    if remaining_name[0] == ",":
+                    # Удалить первый символ
+                        remaining_name = remaining_name[1:]
+            except:
+                d = remaining_name
+            remaining_name = remaining_name.strip()
+            # price = price.split(".")
+            price = price[:price.find(".")]
+            numbers = re.findall(r"\d+", price)
+            price = "".join(numbers)
+            numbers1 = re.findall(r"\d+", ac_price)
+            ac_price = "".join(numbers1)
+                # Найти все цифры
+            digits = re.findall(r"\d+", dpi)
+            # Найти все буквы
+            letters = re.findall(r"[a-zA-Z]", dpi)
+            # Объединить цифры в строку
+            dpi = "".join(digits)
+            # Объединить буквы в строку
+            tp = "".join(letters)
+            data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+    for p in range(1,2):  # Мобільні принтери чеків postorg
+        url = f"https://postorg.com.ua/category/mobilnye-printery-chekov/?proizvoditel%5B%5D=233&proizvoditel%5B%5D=275"
+        r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
+        soup = BeautifulSoup(r.text, 'lxml')
+        ac_price = ''
+        n_elemnts = soup.findAll('div', class_="col-lg-12 flexdiscount-product-wrap 3")
+        for element in n_elemnts:
+            try:
+                name = element.find('div', class_="line-product-name").text.strip()
+            except:
+                name='-'
+            try:
+                price = element.find('div', class_="price").text.strip()
+            except:
+                price = '-'
+            
+            for key in keywords:
+                if key.lower() in name.lower():
+                    kategoria = key
+                    break  # Exit the loop after finding a match
+            else:  # No match found, set category to empty
+                kategoria = ""
+            split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
+            if len(split_name) > 1:
+                remaining_name = split_name[1].strip()
+            else:
+                remaining_name = name
+            markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
+            if len(markat) > 1:
+                remaining_name = markat[1].strip()
+            else:      
+                marka = remaining_name
+            for key in firm:
+                if key.lower() in name.lower():
+                    marka = key
+                    break  # Exit the loop after finding a match
+                else:  # No match found, set category to empty
+                    marka = ""
+            s_name = 'postorg'
+            parts = remaining_name.split(" ")
+            mod = parts[0]
+            if remaining_name == mod:
+                remaining_name 
+            l1 = remaining_name.split()
+            remaining_name = " ".join(l1[1:])
+            dpi = ""
+            try:
+                # Разделить строку по "dpi"
+                parts = remaining_name.lower().split("dpi")
+                    # Извлечь все после dpi
+                remaining_name = parts[1].strip()  # Удаление пробелов
+                    # Извлечь все до dpi и сам dpi
+                dpi = parts[0] 
+            except:
+                d  = remaining_name
+            dpi = dpi.replace("(", "")
+            index = remaining_name.find(")")
+            remaining_name = remaining_name[:index] + remaining_name[index + 1:]
+            try:
+                    if remaining_name[0] == ",":
+                    # Удалить первый символ
+                        remaining_name = remaining_name[1:]
+            except:
+                d = remaining_name
+            remaining_name = remaining_name.strip()
+            # price = price.split(".")
+            price = price[:price.find(".")]
+            numbers = re.findall(r"\d+", price)
+            price = "".join(numbers)
+            numbers1 = re.findall(r"\d+", ac_price)
+            ac_price = "".join(numbers1)
+                # Найти все цифры
+            digits = re.findall(r"\d+", dpi)
+            # Найти все буквы
+            letters = re.findall(r"[a-zA-Z]", dpi)
+            # Объединить цифры в строку
+            dpi = "".join(digits)
+            # Объединить буквы в строку
+            tp = "".join(letters)
+            data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])'''
 header = ['kategoria','marka','mod','tp','dpi', 'remaining_name', 'price', 'ac_price', 's_name'] 
 df = pd.DataFrame(data, columns=header)
 workbook = openpyxl.Workbook()
@@ -106,4 +428,4 @@ worksheet = workbook.active
 worksheet.append(header)
 for row in data:
     worksheet.append(row)
-workbook.save(r'14.7.xlsx')
+workbook.save(r'14.8.xlsx')
