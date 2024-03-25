@@ -11,7 +11,7 @@ url = "https://brain.com.ua/ukr/category/Marshrutyzatory-c1333-143/"
 keywords = ["Принтер етикеток і чеків", "Принтер етикеток","Детектор валют", "Принтер linerless етикеток","Принтер браслетів","Принтер-аплікатор","Детектор валют","Детектор валюти","Лічильник банкнот","Сортувальник банкнот",
             'Принтер чеків', 'Термопринтер','Портативний принтер','POS-принтер','POS-прінтер', 'Настольный принтер этикеток','Промышленный принтер этикеток','Мобильный принтер', 'Мобильный принтер','Принтер этикеток','Принтер чеков и этикеток',
             'Принтер чеков', 'Счетчик банкнот','Термотрансферний принтер','Мобільний принтер для друку етикетки та чеків', 'Принтер для друку етикеток і штрих-коду',  'Принтер мобільний',
-            'Принтер пластикових карток']
+            'Принтер пластикових карток', 'Сортировщик банкнот']
 firm = ["Godex","Zebra", "NRJ", "HPRT", 'BIXOLON']
 data = []
 start_time = time.time()
@@ -485,15 +485,24 @@ for p in range(1,2):  # Принтери етикеток Rozetka
     soup = BeautifulSoup(r.text, 'lxml')
     n_elemnts = soup.findAll('li',class_="catalog-grid__cell catalog-grid__cell_type_slim ng-star-inserted")
     for element in n_elemnts:
-        '''name =  element.find('span', class_="goods-tile__title").find('span').text.strip()'''
         try:
             name = element.find('span', class_="goods-tile__title").text.strip()
         except:
             name='-'
         try:
-            price = element.find('span', class_="goods-tile__price-value").text.strip()
+            ac_price = element.find('span', class_="goods-tile__price-value").text.strip()
+            price = element.find('div', class_='goods-tile__price--old price--gray ng-star-inserted').text.strip()
         except:
-            price = '-'
+            if element.find('span', class_="goods-tile__price-value") != None:
+                price = element.find('span', class_="goods-tile__price-value").text.strip()
+            else :
+                break
+        try :
+            ac_price = element.find('span', class_="goods-tile__price-value").text.strip()
+        except:
+            ac_price = ''
+        if ac_price == price:
+            ac_price =''
         for key in keywords:
             if key.lower() in name.lower():
                 kategoria = key
@@ -516,10 +525,6 @@ for p in range(1,2):  # Принтери етикеток Rozetka
                 break  # Exit the loop after finding a match
             else:  # No match found, set category to empty
                 marka = ""
-        try:
-            price = soup.find('p', class_="product-price__small ng-star-inserted").text.strip()
-        except:
-            ac_price = "-"
         s_name = 'rozetka'
         parts = remaining_name.split(" ")
         mod = parts[0]
@@ -566,15 +571,24 @@ for p in range(1,2):  #Лічильники банкнот і детектори
     soup = BeautifulSoup(r.text, 'lxml')
     n_elemnts = soup.findAll('li',class_="catalog-grid__cell catalog-grid__cell_type_slim ng-star-inserted")
     for element in n_elemnts:
-        '''name =  element.find('span', class_="goods-tile__title").find('span').text.strip()'''
         try:
             name = element.find('span', class_="goods-tile__title").text.strip()
         except:
             name='-'
         try:
-            price = element.find('span', class_="goods-tile__price-value").text.strip()
+            ac_price = element.find('span', class_="goods-tile__price-value").text.strip()
+            price = element.find('div', class_='goods-tile__price--old price--gray ng-star-inserted').text.strip()
         except:
-            price = '-'
+            price = element.find('span', class_="goods-tile__price-value").text.strip()
+        try :
+            ac_price = element.find('span', class_="goods-tile__price-value").text.strip()
+        except:
+            if element.find('span', class_="goods-tile__price-value") != None:
+                price = element.find('span', class_="goods-tile__price-value").text.strip()
+            else :
+                break
+        if ac_price == price:
+            ac_price = ''
         for key in keywords:
             if key.lower() in name.lower():
                 kategoria = key
@@ -597,10 +611,6 @@ for p in range(1,2):  #Лічильники банкнот і детектори
                 break  # Exit the loop after finding a match
             else:  # No match found, set category to empty
                 marka = ""
-        try:
-            price = soup.find('p', class_="product-price__small ng-star-inserted").text.strip()
-        except:
-            ac_price = "-"
         s_name = 'rozetka'
         parts = remaining_name.split(" ")
         mod = parts[0]
@@ -647,15 +657,24 @@ for p in range(1,2):   # POS-принтери Rozetka
     soup = BeautifulSoup(r.text, 'lxml')
     n_elemnts = soup.findAll('li',class_="catalog-grid__cell catalog-grid__cell_type_slim ng-star-inserted")
     for element in n_elemnts:
-        '''name =  element.find('span', class_="goods-tile__title").find('span').text.strip()'''
         try:
             name = element.find('span', class_="goods-tile__title").text.strip()
         except:
             name='-'
         try:
-            price = element.find('span', class_="goods-tile__price-value").text.strip()
+            ac_price = element.find('span', class_="goods-tile__price-value").text.strip()
+            price = element.find('div', class_='goods-tile__price--old price--gray ng-star-inserted').text.strip()
         except:
-            price = '-'
+            if element.find('span', class_="goods-tile__price-value") != None:
+                price = element.find('span', class_="goods-tile__price-value").text.strip()
+            else :
+                break
+        try :
+            ac_price = element.find('span', class_="goods-tile__price-value").text.strip()
+        except:
+            ac_price = ''
+        if ac_price == price:
+            ac_price =''
         for key in keywords:
             if key.lower() in name.lower():
                 kategoria = key
@@ -678,10 +697,6 @@ for p in range(1,2):   # POS-принтери Rozetka
                 break  # Exit the loop after finding a match
             else:  # No match found, set category to empty
                 marka = ""
-        try:
-            price = soup.find('p', class_="product-price__small ng-star-inserted").text.strip()
-        except:
-            ac_price = "-"
         s_name = 'rozetka'
         parts = remaining_name.split(" ")
         mod = parts[0]
@@ -722,6 +737,7 @@ for p in range(1,2):   # POS-принтери Rozetka
         # Объединить буквы в строку
         tp = "".join(letters)
         data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+
 
 for p in range(1,3) :   #  Принтери етикеток Epicentr
     print(p)
@@ -1286,9 +1302,15 @@ for p in range(1,4):    #   Товари fornit
         except:
             name='-'
         try:
-            price = element.find('div', class_="catalogCard-price").text.strip()
+            price = element.find('div', class_="catalogCard-oldPrice").text.strip()
         except:
-            price = '-'
+            price = element.find('div', class_="catalogCard-price").text.strip()
+        try:
+            ac_price = element.find('div', class_="catalogCard-price").text.strip()
+        except:
+            ac_price =''
+        if ac_price == price:
+            ac_price =''
         for key in keywords:
             if key.lower() in name.lower():
                 kategoria = key
@@ -1351,64 +1373,7 @@ for p in range(1,4):    #   Товари fornit
         # Объединить буквы в строку
         tp = "".join(letters)
         data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
-    #  Товари Posttorg
-posttorg = [
-    'https://posttorg.com.ua/product/printer_etiketok_godex_g500/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-g530/',
-    'https://posttorg.com.ua/product/printer_etiketok_godex_ez-dt2_plus/',
-    'https://posttorg.com.ua/product/printer_etiketok_godex_dt2x/',
-    'https://posttorg.com.ua/product/printer_etiketok_godex_ez-dt4_plus/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-dt4x/',
-    'https://posttorg.com.ua/product/mobilnyj-printer-chekov-etiketok-godex-mx30i/',
-    'https://posttorg.com.ua/product/printer_etiketok_godex_rt-200i/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-rt863i/',
-    'https://posttorg.com.ua/product/printer_etiketok_godex_ez-6300_plus/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-ez2350i/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-ez6250i/',
-    'https://posttorg.com.ua/product/mobilnyj-printer-chekov-etiketok-godex-mx30/',
-    'https://posttorg.com.ua/product/mobilnyj-printer-chekov-etiketok-godex-mx30i/',
-    'https://posttorg.com.ua/product/printer_etiketok_godex_rt-200/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-zx-1200i/',
-    'https://posttorg.com.ua/product/printer_etiketok_godex_zx-1300i/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-zx1600i/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-zx420i/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-rt730iw/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-ez130/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-ez6300-plus/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-hd830i/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-zx1200xi/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-zx1300xi/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-zx430i/',
-    'https://posttorg.com.ua/product/printer-etiketok-godex-gtl-100/',
-    'https://posttorg.com.ua/product/mobilnyj-printer-chekov-etiketok-godex-mx20/',
-    'https://posttorg.com.ua/product/printer-etiketok-hprt-elite/',
-    'https://posttorg.com.ua/product/mobilnyj-printer-chekov-hprt-mt800/',
-    'https://posttorg.com.ua/product/printer-etiketok-bixolon-samsung-slp-dx420/',
-    'https://posttorg.com.ua/product/mobilnyj-printer-etiketok-bixolon-spp-l3000/',
-    'https://posttorg.com.ua/product/printer-etiketok-bixolon-xq-840/',
-    'https://posttorg.com.ua/product/printer-etiketok-hprt-ht100/',
-    'https://posttorg.com.ua/product/printer-etiketok-hprt-ht300/',
-    'https://posttorg.com.ua/product/printer-etiketok-hprt-ht330/',
-    'https://posttorg.com.ua/product/printer-chekov-etiketok-hprt-lpq58/',
-    'https://posttorg.com.ua/product/printer-chekov-etiketok-hprt-lpq80/',
-    'https://posttorg.com.ua/product/mobilnyj-printer-chekov-etiketok-bixolon-xm7-40/',
-    'https://posttorg.com.ua/product/printer_chekov_bixolon_srp-350iii/',
-    'https://posttorg.com.ua/product/printer-chekov-bixolon-srp-e300/',
-    'https://posttorg.com.ua/product/printer-chekov-bixolon-srp-q200/',
-    'https://posttorg.com.ua/product/mobilnyj-printer-etiketok-chekov-hprt-hm-e200/',
-    'https://posttorg.com.ua/product/mobilnyj-printer-chekov-hprt-mpt-ii/',
-    'https://posttorg.com.ua/product/printer-chekov-hprt-ppt2-a/',
-    'https://posttorg.com.ua/product/printer-chekov-hprt-tp585/',
-    'https://posttorg.com.ua/product/printer-chekov-hprt-tp806/',
-    'https://posttorg.com.ua/product/printer-chekov-hprt-tp808/',
-    'https://posttorg.com.ua/product/printer-chekov-hprt-tp809/',
-    'https://posttorg.com.ua/product/printer-chekov-hprt-tp80k/',
-    'https://posttorg.com.ua/product/printer-chekov-bixolon-srp-380/',
-    'https://posttorg.com.ua/product/printer-chekov-hprt-ppt2-a/',
-    'https://posttorg.com.ua/product/printer-chekov-hprt-tp805l/'
-]
 print('m')
-
 for p in range(1,2):  # Настольные принтеры этикеток postorg
     url = f"https://postorg.com.ua/category/nastolnye/?proizvoditel%5B%5D=233&proizvoditel%5B%5D=268&proizvoditel%5B%5D=275"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -1828,9 +1793,15 @@ for p in range(1,2): # Принтеры чеков 600dpi
         except:
             name='-'
         try:
-            price = element.find('span', class_="product-price__main-value").text.strip()
+            price = element.find('span', class_= "product-price__old-value").text.strip()
         except:
-            price = '-'
+            price = element.find('span', class_="product-price__main-value").text.strip()
+        try:
+            ac_price = element.find('span', class_="product-price__main-value").text.strip()
+        except:
+            ac_price = ''
+        if ac_price == price :
+            ac_price = ''
         for key in keywords:
             if key.lower() in name.lower():
                 kategoria = key
@@ -1913,9 +1884,15 @@ for p in range(1,2):  # Принтеры этикеток 600dpi
         except:
             name='-'
         try:
-            price = element.find('span', class_="product-price__main-value").text.strip()
+            price = element.find('span', class_= "product-price__old-value").text.strip()
         except:
-            price = '-'
+            price = element.find('span', class_="product-price__main-value").text.strip()
+        try:
+            ac_price = element.find('span', class_="product-price__main-value").text.strip()
+        except:
+            ac_price = ''
+        if ac_price == price :
+            ac_price = ''
         for key in keywords:
             if key.lower() in name.lower():
                 kategoria = key
@@ -1991,15 +1968,20 @@ for p in range(1,2): # Счетчики банкнот 600dpi
             Z = None
         if Z == None:
             break
-        '''name =  element.find('span', class_="goods-tile__title").find('span').text.strip()'''
         try:
             name = element.find('div', class_="product-cut__title").text.strip()
         except:
             name='-'
         try:
-            price = element.find('span', class_="product-price__main-value").text.strip()
+            price = element.find('span', class_= "product-price__old-value").text.strip()
         except:
-            price = '-'
+            price = element.find('span', class_="product-price__main-value").text.strip()
+        try:
+            ac_price = element.find('span', class_="product-price__main-value").text.strip()
+        except:
+            ac_price = ''
+        if ac_price == price :
+            ac_price = ''
         for key in keywords:
             if key.lower() in name.lower():
                 kategoria = key
@@ -2182,7 +2164,6 @@ gipercentrKIEV = [
     'https://gipercenter.kiev.ua/ua/p1425897913-godex-zx420i.html',
     'https://gipercenter.kiev.ua/ua/p1414285814-printer-etiketok-bixolon.html',
     'https://gipercenter.kiev.ua/ua/p1414283692-printer-etiketok-godex.html',
-    'https://gipercenter.kiev.ua/ua/p1414283733-printer-etiketok-godex.html',
     'https://gipercenter.kiev.ua/ua/p1414283695-printer-etiketok-godex.html',
     'https://gipercenter.kiev.ua/ua/p1239670289-printer-etiketok-dlya.html',
     'https://gipercenter.kiev.ua/ua/p1414283672-printer-etiketok-chekov.html',
@@ -2202,12 +2183,18 @@ for url in gipercentrKIEV:
         print(f"Error: {e}")
         continue  
     soup = BeautifulSoup(response.text, 'lxml')
+    price =''
     try:
         price = soup.find('span', class_="Text__ui_text_size_x7l--cgh_a Text__ui_text_font-weight_bold--qRTru").text.strip()   
         ac_price = ''
     except:
-        price =  soup.find('span', class_="Text__ui_text_size_xs--GXoZP Text__ui_text_decoration_line-through--lN0mm").text.strip()   
+        if price != None:
+            try:
+                price =  soup.find('span', class_="Text__ui_text_size_xs--GXoZP Text__ui_text_decoration_line-through--lN0mm").text.strip()   
+            except:
+                 break
         ac_price = soup.find('span',class_="Text__ui_text_size_x7l--cgh_a").text.strip()
+      
     name_link = soup.find('h1',class_="Text__ui_text_size_xl--hiLG7 Text__ui_text_line-height_m--I9dbv Text__ui_text_font-weight_bold--qRTru")
     name = name_link.text.strip()  
     for key in keywords:
