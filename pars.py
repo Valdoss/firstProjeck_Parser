@@ -11,9 +11,10 @@ url = "https://brain.com.ua/ukr/category/Marshrutyzatory-c1333-143/"
 keywords = ["Принтер етикеток і чеків", "Принтер етикеток","Детектор валют", "Принтер linerless етикеток","Принтер браслетів","Принтер-аплікатор","Детектор валют","Детектор валюти","Лічильник банкнот","Сортувальник банкнот",
             'Принтер чеків', 'Термопринтер','Портативний принтер','POS-принтер','POS-прінтер', 'Настольный принтер этикеток','Промышленный принтер этикеток','Мобильный принтер', 'Мобильный принтер','Принтер этикеток','Принтер чеков и этикеток',
             'Принтер чеков', 'Счетчик банкнот','Термотрансферний принтер','Мобільний принтер для друку етикетки та чеків', 'Принтер для друку етикеток і штрих-коду',  'Принтер мобільний',
-            'Принтер пластикових карток', 'Сортировщик банкнот']
+            'Принтер пластикових карток', 'Сортировщик банкнот','Термопринтер мобильный принтер чеков','Настольный принтер чеков/этикеток']
 firm = ["Godex","Zebra", "NRJ", "HPRT", 'BIXOLON']
 data = []
+c=0
 start_time = time.time()
 for p in range(1, 5):
     # Обладнання для друку етикеток Reef 
@@ -56,8 +57,7 @@ for p in range(1, 5):
             parts = remaining_name.split(" ")
             mod = parts[0]
         except:
-           if remaining_name is mod:
-                remaining_name 
+            c
         l1 = remaining_name.split()
         remaining_name = " ".join(l1[1:])
         dpi = ""
@@ -72,7 +72,6 @@ for p in range(1, 5):
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
 # Проверить первый символ
         try:
             if remaining_name[0] == ",":
@@ -93,7 +92,81 @@ for p in range(1, 5):
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 for p in range(1, 3): #Обладнання для друку чеків Reef
     print(p)
     url = f"https://shop.reef.ua/ua/obladnannya-dlya-druku-chekiv/mfp/20-,%D0%9C%D0%BE%D0%B1%D1%96%D0%BB%D1%8C%D0%BD%D0%B8%D0%B9,%D0%9D%D0%B0%D1%81%D1%82%D1%96%D0%BB%D1%8C%D0%BD%D0%B8%D0%B9/manufacturers,bixolon,godex,hprt/page-{p}/"
@@ -151,7 +224,6 @@ for p in range(1, 3): #Обладнання для друку чеків Reef
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
             if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -171,7 +243,83 @@ for p in range(1, 3): #Обладнання для друку чеків Reef
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 for p in range(1, 2): #Банківське обладнання Reef
     print(p)
     url = f"https://shop.reef.ua/ua/bankivske-obladnannia/mfp/manufacturers,nrj/"
@@ -231,7 +379,6 @@ for p in range(1, 2): #Банківське обладнання Reef
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
             if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -251,7 +398,82 @@ for p in range(1, 2): #Банківське обладнання Reef
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
         print ('-')
 
 for p in range(1,4): # ПРИНТЕРИ ЕТИКЕТОК  Brain
@@ -306,7 +528,6 @@ for p in range(1,4): # ПРИНТЕРИ ЕТИКЕТОК  Brain
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                     # Удалить первый символ
@@ -326,7 +547,80 @@ for p in range(1,4): # ПРИНТЕРИ ЕТИКЕТОК  Brain
         dpi = "".join(digits)
             # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+            
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        if remaining_name[0].isdigit():
+           reefCode = remaining_name
+           remaining_name = '' 
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod ,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 for p in range(1,2):    # ДЕТЕКТОРИ ВАЛЮТ Brain
     url = f"https://brain.com.ua/ukr/category/Detektori_valyut-c1082/filter=3-21577030000;filterbyavail=active/"
     r = requests.get(url, timeout=20)
@@ -379,7 +673,6 @@ for p in range(1,2):    # ДЕТЕКТОРИ ВАЛЮТ Brain
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                     # Удалить первый символ
@@ -399,11 +692,81 @@ for p in range(1,2):    # ДЕТЕКТОРИ ВАЛЮТ Brain
         dpi = "".join(digits)
             # Объединить буквы в строку
         tp = "".join(letters)
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+            
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
         if mod is None or mod == '-':
-             break
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        if remaining_name[0].isdigit():
+           reefCode = remaining_name
+           remaining_name = '' 
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 
-for p in range(1,3): # ПРИНТЕРИ ЧЕКІВ Brain 
+for p in range(1,2): # ПРИНТЕРИ ЧЕКІВ Brain 
     url = f"https://brain.com.ua/ukr/category/Printeri_chekiv-c335/filter=3-21515490000,3-21516930000,3-75029600000;filterbyavail=active;page={p}/"
     r = requests.get(url, timeout=20)
     soup = BeautifulSoup(r.text, 'lxml')
@@ -455,7 +818,6 @@ for p in range(1,3): # ПРИНТЕРИ ЧЕКІВ Brain
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                     # Удалить первый символ
@@ -475,9 +837,78 @@ for p in range(1,3): # ПРИНТЕРИ ЧЕКІВ Brain
         dpi = "".join(digits)
             # Объединить буквы в строку
         tp = "".join(letters)
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
         if mod is None or mod == '-':
-             break
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        if remaining_name[0].isdigit():
+           reefCode = remaining_name
+           remaining_name = '' 
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 
 for p in range(1,2):  # Принтери етикеток Rozetka
     url = f"https://rozetka.com.ua/ua/printery-etiketok/c4625268/producer=bixolon,godex,hprt,zebra1;seller=rozetka/"
@@ -544,7 +975,6 @@ for p in range(1,2):  # Принтери етикеток Rozetka
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -564,7 +994,81 @@ for p in range(1,2):  # Принтери етикеток Rozetka
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 for p in range(1,2):  #Лічильники банкнот і детектори валют Rozetka
     url = f"https://rozetka.com.ua/ua/counters_and_currency_detectors/c754404/producer=nrj;seller=rozetka;state=new/"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -579,7 +1083,10 @@ for p in range(1,2):  #Лічильники банкнот і детектори
             ac_price = element.find('span', class_="goods-tile__price-value").text.strip()
             price = element.find('div', class_='goods-tile__price--old price--gray ng-star-inserted').text.strip()
         except:
-            price = element.find('span', class_="goods-tile__price-value").text.strip()
+            try:
+                price = element.find('span', class_="goods-tile__price-value").text.strip()
+            except:
+                break
         try :
             ac_price = element.find('span', class_="goods-tile__price-value").text.strip()
         except:
@@ -630,7 +1137,6 @@ for p in range(1,2):  #Лічильники банкнот і детектори
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -650,7 +1156,81 @@ for p in range(1,2):  #Лічильники банкнот і детектори
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 for p in range(1,2):   # POS-принтери Rozetka
     url = f"https://rozetka.com.ua/ua/pos-printery/c4625319/producer=bixolon,hprt;seller=rozetka/"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -716,7 +1296,6 @@ for p in range(1,2):   # POS-принтери Rozetka
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -736,7 +1315,81 @@ for p in range(1,2):   # POS-принтери Rozetka
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 
 
 for p in range(1,3) :   #  Принтери етикеток Epicentr
@@ -803,7 +1456,6 @@ for p in range(1,3) :   #  Принтери етикеток Epicentr
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -823,7 +1475,81 @@ for p in range(1,3) :   #  Принтери етикеток Epicentr
         dpi = "".join(digits)
         tp = "".join(letters)
         price = price.strip(".")
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 for p in range(1,2):    #   Принтери чеків Epicentr
     url =  f'https://epicentrk.ua/ua/shop/printery-chekov/filter/seller-is-epicentr/brand-is-17b16564dba245d6b361e1ff72b6e57f-or-63e4571d0d6a4ec68ae73fe2c464d150/apply/'
     r = requests.get(url, timeout=20)
@@ -887,7 +1613,6 @@ for p in range(1,2):    #   Принтери чеків Epicentr
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -906,8 +1631,84 @@ for p in range(1,2):    #   Принтери чеків Epicentr
         letters = re.findall(r"[a-zA-Z]", dpi)
         dpi = "".join(digits)
         tp = "".join(letters)
-        price = price.strip(".")
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        price = price.split(".")
+        price = price[0]
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
+    
 for p in range(1,2):    # Детектори валют Epicentr
     url = f'https://epicentrk.ua/ua/shop/detektory-valyut/filter/seller-is-epicentr/brand-is-253bd6381334407c9b875c3783d38a0c/apply/'
     r = requests.get(url, timeout=20)
@@ -971,7 +1772,6 @@ for p in range(1,2):    # Детектори валют Epicentr
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -990,8 +1790,82 @@ for p in range(1,2):    # Детектори валют Epicentr
         letters = re.findall(r"[a-zA-Z]", dpi)
         dpi = "".join(digits)
         tp = "".join(letters)
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
         price = price.strip(".")
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 # Товари Megapos
 megapos = [
     'https://megapos.com.ua/uk/nastolnyj-printer-etiketok-godex-ez-g500',
@@ -1062,6 +1936,7 @@ megapos = [
     'https://megapos.com.ua/uk/printer-chekov-hprt-tp808',
     'https://megapos.com.ua/uk/printer-chekov-hprt-tp809',
     'https://megapos.com.ua/uk/printer-chekov-hprt-tp80k',
+    'https://megapos.com.ua/uk/printer-chekov-hprt-lpq80',
     'https://megapos.com.ua/uk/printer-chekov-hprt-tp80k-l',
     'https://megapos.com.ua/uk/mobilnyj-printer-bixolon-spp-r200iii',
     'https://megapos.com.ua/uk/mobilnyj-printer-bixolon-spp-r310-wk',
@@ -1143,7 +2018,6 @@ for url in megapos:
         d  = remaining_name
     dpi = dpi.replace("(", "")
     index = remaining_name.find(")")
-    remaining_name = remaining_name[:index] + remaining_name[index + 1:]
     try:
             if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -1162,7 +2036,81 @@ for url in megapos:
     letters = re.findall(r"[a-zA-Z]", dpi)
     dpi = "".join(digits)
     tp = "".join(letters) 
-    data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+    if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+    if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+    cyrillic_text = ""
+    remaining_name = remaining_name.replace('+',',')
+    found_cyrillic = False
+    for char in remaining_name:
+        if ord(char) >= 1040 and ord(char) <= 1103:
+            found_cyrillic = True
+            cyrillic_text += char
+        elif found_cyrillic:
+            cyrillic_text += char
+    if cyrillic_text:
+        print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+    else:
+        print("Кириллица не найдена.")
+    for item in remaining_name:
+        if(item == ',' or item == ' '):
+            pass
+        elif item in cyrillic_text:
+            remaining_name = remaining_name.replace(item, '')
+    remaining_name = remaining_name.replace('+',',')
+    if mod == '':
+            break
+    reefCode = ''
+    par = cyrillic_text.split('(')
+    p =''
+    try:
+        reefCode = par[1]
+        cyrillic_text = par[0]
+    except:
+        pass
+    try:
+        if remaining_name[0].isdigit():
+            reefCode = remaining_name
+            remaining_name = '' 
+    except:
+        pass
+    foundCode = False
+    for ch in remaining_name:
+        if(ch == '('):
+            foundCode = True
+            reefCode += ch
+        elif foundCode:
+            if ch.isdigit():
+                p = remaining_name.split('(')
+                reefCode += ch
+            else :
+                foundCode = False
+    try:
+        reefCode = p[1]
+        remaining_name = p[0]
+    except:
+        pass
+    remaining_name = remaining_name.upper()
+    ZebraCod = ''
+    for byk in remaining_name:
+        if byk == 'Z':
+            Zeb = remaining_name.split('Z')
+            remaining_name = Zeb[0]
+            try:   
+                ZebraCod ='Z'+ Zeb[1]
+            except:
+                pass
+    data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 # Товари technologic
 technologic = [
     'https://technologic.ua/cat/nastolnye-printery-etiketok/filter-brands-is-godex-taiwan-or-hprt/',
@@ -1171,8 +2119,13 @@ technologic = [
     'https://technologic.ua/cat/schetchiki-banknot/filter-brands-is-nrj/'
 ]
 for url in technologic:
-
-    for p in range(1,2):  # Настольные принтеры этикеток technologic
+    if url == 'https://technologic.ua/cat/nastolnye-printery-etiketok/filter-brands-is-godex-taiwan-or-hprt/':
+        a = 1
+        b = 3
+    else:
+        a = 1
+        b = 2
+    for p in range(a,b):  # Настольные принтеры этикеток technologic
     
         r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
         soup = BeautifulSoup(r.text, 'lxml')
@@ -1228,7 +2181,6 @@ for url in technologic:
                 d  = remaining_name
             dpi = dpi.replace("(", "")
             index = remaining_name.find(")")
-            remaining_name = remaining_name[:index] + remaining_name[index + 1:]
             try:
                     if remaining_name[0] == ",":
                     # Удалить первый символ
@@ -1248,7 +2200,79 @@ for url in technologic:
             dpi = "".join(digits)
             # Объединить буквы в строку
             tp = "".join(letters)
-            data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+            if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+                remaining_name = remaining_name[1:]
+            if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+                remaining_name = remaining_name[:-1]
+            cyrillic_text = ""
+            remaining_name = remaining_name.replace('+',',')
+            found_cyrillic = False
+            for char in remaining_name:
+                if ord(char) >= 1040 and ord(char) <= 1103:
+                    found_cyrillic = True
+                    cyrillic_text += char
+                elif found_cyrillic:
+                    cyrillic_text += char
+            if cyrillic_text:
+                print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+            else:
+                print("Кириллица не найдена.")
+            for item in remaining_name:
+                if(item == ',' or item == ' '):
+                    pass
+                elif item in cyrillic_text:
+                    remaining_name = remaining_name.replace(item, '')
+            remaining_name = remaining_name.replace('+',',')
+            reefCode = ''
+            par = cyrillic_text.split('(')
+            p =''
+            try:
+                reefCode = par[1]
+                cyrillic_text = par[0]
+            except:
+                pass
+            try:
+                if remaining_name[0].isdigit():
+                    reefCode = remaining_name
+                    remaining_name = '' 
+            except:
+                pass
+            foundCode = False
+            for ch in remaining_name:
+                if(ch == '('):
+                    foundCode = True
+                    reefCode += ch
+                elif foundCode:
+                    if ch.isdigit():
+                        p = remaining_name.split('(')
+                        reefCode += ch
+                    else :
+                        foundCode = False
+            try:
+                reefCode = p[1]
+                remaining_name = p[0]
+            except:
+                pass
+            remaining_name = remaining_name.upper()
+            ZebraCod = ''
+            for byk in remaining_name:
+                if byk == 'Z':
+                    Zeb = remaining_name.split('Z')
+                    remaining_name = Zeb[0]
+                    try:   
+                        ZebraCod ='Z'+ Zeb[1]
+                    except:
+                        pass
+            data.append([kategoria,  # Use empty string if kategoria is None
+            marka,
+            mod or 0,
+            tp or 0,
+            dpi or 0,
+            remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+            price or 0,
+            ac_price or 0,
+            s_name or 0 ])
         
     #   Товари fornit
 fornit = [
@@ -1289,90 +2313,165 @@ fornit = [
     'https://fornit.com.ua/prynter-chekiv-hprt-ppt2-a/',
     'https://fornit.com.ua/prynter-chekiv-hprt-tp80k/'
 ]
-for p in range(1,4):    #   Товари fornit
+# for p in range(1,4):    #   Товари fornit
     
-    url = f"https://fornit.com.ua/katalog/filter/brand=95,96,99,160;page={p};price=1150-445000/"
-    r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
-    soup = BeautifulSoup(r.text, 'lxml')
-    ac_price = ''
-    n_elemnts = soup.findAll('li', class_="catalog-grid__item")
-    for element in n_elemnts:
-        try:
-            name = element.find('div', class_="catalogCard-title").text.strip()
-        except:
-            name='-'
-        try:
-            price = element.find('div', class_="catalogCard-oldPrice").text.strip()
-        except:
-            price = element.find('div', class_="catalogCard-price").text.strip()
-        try:
-            ac_price = element.find('div', class_="catalogCard-price").text.strip()
-        except:
-            ac_price =''
-        if ac_price == price:
-            ac_price =''
-        for key in keywords:
-            if key.lower() in name.lower():
-                kategoria = key
-                break  # Exit the loop after finding a match
-        else:  # No match found, set category to empty
-            kategoria = ""
-        split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
-        if len(split_name) > 1:
-            remaining_name = split_name[1].strip()
-        else:
-            remaining_name = name
-        markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
-        if len(markat) > 1:
-            remaining_name = markat[1].strip()
-        else:      
-            marka = remaining_name
-        for key in firm:
-            if key.lower() in name.lower():
-                marka = key
-                break  # Exit the loop after finding a match
-            else:  # No match found, set category to empty
-                marka = ""
-        s_name = 'fornit'
-        parts = remaining_name.split(" ")
-        mod = parts[0]
-        if remaining_name == mod:
-            remaining_name 
-        l1 = remaining_name.split()
-        remaining_name = " ".join(l1[1:])
-        dpi = ""
-        try:
-            # Разделить строку по "dpi"
-            parts = remaining_name.lower().split("dpi")
-                # Извлечь все после dpi
-            remaining_name = parts[1].strip()  # Удаление пробелов
-                # Извлечь все до dpi и сам dpi
-            dpi = parts[0] 
-        except:
-            d  = remaining_name
-        dpi = dpi.replace("(", "")
-        index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
-        try:
-                if remaining_name[0] == ",":
-                # Удалить первый символ
-                    remaining_name = remaining_name[1:]
-        except:
-            d = remaining_name
-        remaining_name = remaining_name.strip()
-        numbers = re.findall(r"\d+", price)
-        price = "".join(numbers)
-        numbers1 = re.findall(r"\d+", ac_price)
-        ac_price = "".join(numbers1)
-            # Найти все цифры
-        digits = re.findall(r"\d+", dpi)
-        # Найти все буквы
-        letters = re.findall(r"[a-zA-Z]", dpi)
-        # Объединить цифры в строку
-        dpi = "".join(digits)
-        # Объединить буквы в строку
-        tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+#     url = f"https://fornit.com.ua/katalog/filter/brand=95,96,99,160;page={p};price=1150-445000/"
+#     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
+#     soup = BeautifulSoup(r.text, 'lxml')
+#     ac_price = ''
+#     n_elemnts = soup.findAll('li', class_="catalog-grid__item")
+#     for element in n_elemnts:
+#         try:
+#             name = element.find('div', class_="catalogCard-title").text.strip()
+#         except:
+#             name='-'
+#         try:
+#             price = element.find('div', class_="catalogCard-oldPrice").text.strip()
+#         except:
+#             price = element.find('div', class_="catalogCard-price").text.strip()
+#         try:
+#             ac_price = element.find('div', class_="catalogCard-price").text.strip()
+#         except:
+#             ac_price =''
+#         if ac_price == price:
+#             ac_price =''
+#         for key in keywords:
+#             if key.lower() in name.lower():
+#                 kategoria = key
+#                 break  # Exit the loop after finding a match
+#         else:  # No match found, set category to empty
+#             kategoria = ""
+#         split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
+#         if len(split_name) > 1:
+#             remaining_name = split_name[1].strip()
+#         else:
+#             remaining_name = name
+#         markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
+#         if len(markat) > 1:
+#             remaining_name = markat[1].strip()
+#         else:      
+#             marka = remaining_name
+#         for key in firm:
+#             if key.lower() in name.lower():
+#                 marka = key
+#                 break  # Exit the loop after finding a match
+#             else:  # No match found, set category to empty
+#                 marka = ""
+#         s_name = 'fornit'
+#         parts = remaining_name.split(" ")
+#         mod = parts[0]
+#         if remaining_name == mod:
+#             remaining_name 
+#         l1 = remaining_name.split()
+#         remaining_name = " ".join(l1[1:])
+#         dpi = ""
+#         try:
+#             # Разделить строку по "dpi"
+#             parts = remaining_name.lower().split("dpi")
+#                 # Извлечь все после dpi
+#             remaining_name = parts[1].strip()  # Удаление пробелов
+#                 # Извлечь все до dpi и сам dpi
+#             dpi = parts[0] 
+#         except:
+#             d  = remaining_name
+#         dpi = dpi.replace("(", "")
+#         index = remaining_name.find(")")
+#         try:
+#                 if remaining_name[0] == ",":
+#                 # Удалить первый символ
+#                     remaining_name = remaining_name[1:]
+#         except:
+#             d = remaining_name
+#         remaining_name = remaining_name.strip()
+#         numbers = re.findall(r"\d+", price)
+#         price = "".join(numbers)
+#         numbers1 = re.findall(r"\d+", ac_price)
+#         ac_price = "".join(numbers1)
+#             # Найти все цифры
+#         digits = re.findall(r"\d+", dpi)
+#         # Найти все буквы
+#         letters = re.findall(r"[a-zA-Z]", dpi)
+#         # Объединить цифры в строку
+#         dpi = "".join(digits)
+#         # Объединить буквы в строку
+#         tp = "".join(letters)
+#         if mod == '-7200':
+#             mod = 'AL-7200'
+#         if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+#             remaining_name = remaining_name[1:]
+#         if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+#             remaining_name = remaining_name[:-1]
+            # cyrillic_text = ""
+            # remaining_name = remaining_name.replace('+',',')
+            # found_cyrillic = False
+            # for char in remaining_name:
+            #     if ord(char) >= 1040 and ord(char) <= 1103:
+            #         found_cyrillic = True
+            #         cyrillic_text += char
+            #     elif found_cyrillic:
+            #         cyrillic_text += char
+            # if cyrillic_text:
+            #     print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+            # else:
+            #     print("Кириллица не найдена.")
+            # for item in remaining_name:
+            #     if(item == ',' or item == ' '):
+            #         pass
+            #     elif item in cyrillic_text:
+            #         remaining_name = remaining_name.replace(item, '')
+            # remaining_name = remaining_name.replace('+',',')
+#         if mod == '':
+#             break
+        # reefCode = ''
+        # par = cyrillic_text.split('(')
+        # p =''
+        # try:
+        #     reefCode = par[1]
+        #     cyrillic_text = par[0]
+        # except:
+        #     pass
+        # try:
+        #     if remaining_name[0].isdigit():
+        #         reefCode = remaining_name
+        #         remaining_name = '' 
+        # except:
+        #     pass
+        # foundCode = False
+        # for ch in remaining_name:
+        #     if(ch == '('):
+        #         foundCode = True
+        #         reefCode += ch
+        #     elif foundCode:
+        #         if ch.isdigit():
+        #             p = remaining_name.split('(')
+        #             reefCode += ch
+        #         else :
+        #             foundCode = False
+        # try:
+        #     reefCode = p[1]
+        #     remaining_name = p[0]
+        # except:
+        #     pass
+        # remaining_name = remaining_name.upper()
+        # ZebraCod = ''
+        # for byk in remaining_name:
+        #     if byk == 'Z':
+        #         Zeb = remaining_name.split('Z')
+        #         remaining_name = Zeb[0]
+        #         try:   
+        #           ZebraCod ='Z'+ Zeb[1]
+        #         except:
+        #             pass
+#         data.append([kategoria,  # Use empty string if kategoria is None
+#         marka,
+#         mod or 0,
+#         tp or 0,
+#         dpi or 0,
+#         remaining_name or 0,
+        # cyrillic_text,  reefCode, ZebraCod,
+#         price or 0,
+#         ac_price or 0,
+#         s_name or 0 ])
 print('m')
 for p in range(1,2):  # Настольные принтеры этикеток postorg
     url = f"https://postorg.com.ua/category/nastolnye/?proizvoditel%5B%5D=233&proizvoditel%5B%5D=268&proizvoditel%5B%5D=275"
@@ -1431,7 +2530,6 @@ for p in range(1,2):  # Настольные принтеры этикеток p
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -1454,7 +2552,81 @@ for p in range(1,2):  # Настольные принтеры этикеток p
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 for p in range(1,2):  #  Принтер Чеків-етикеток этикеток postorg
     url = f"https://postorg.com.ua/category/chekov-etiketok/?proizvoditel%5B%5D=275"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -1512,7 +2684,6 @@ for p in range(1,2):  #  Принтер Чеків-етикеток этикет
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -1534,7 +2705,81 @@ for p in range(1,2):  #  Принтер Чеків-етикеток этикет
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 for p in range(1,2):  # Промышленный принтер этикеток postorg
     url = f"https://postorg.com.ua/category/promyshlennye/?proizvoditel%5B%5D=233&proizvoditel%5B%5D=268"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -1592,7 +2837,6 @@ for p in range(1,2):  # Промышленный принтер этикеток
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -1614,7 +2858,81 @@ for p in range(1,2):  # Промышленный принтер этикеток
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 for p in range(1,2):  # Настільні принтери чеків postorg 
     url = f"https://postorg.com.ua/category/nastolnye-printery-chekov/?proizvoditel%5B%5D=233&proizvoditel%5B%5D=275"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -1672,7 +2990,6 @@ for p in range(1,2):  # Настільні принтери чеків postorg
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -1694,7 +3011,81 @@ for p in range(1,2):  # Настільні принтери чеків postorg
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 for p in range(1,2):  # Мобільні принтери чеків postorg
     url = f"https://postorg.com.ua/category/mobilnye-printery-chekov/?proizvoditel%5B%5D=233&proizvoditel%5B%5D=275"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -1752,7 +3143,6 @@ for p in range(1,2):  # Мобільні принтери чеків postorg
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -1774,7 +3164,81 @@ for p in range(1,2):  # Мобільні принтери чеків postorg
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 for p in range(1,2): # Принтеры чеков 600dpi  
     url = f"https://600dpi.com.ua/printery-chekov/brand-bixolon-or-godex-or-hprt-or-zebra"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -1843,7 +3307,6 @@ for p in range(1,2): # Принтеры чеков 600dpi
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -1863,7 +3326,81 @@ for p in range(1,2): # Принтеры чеков 600dpi
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
         
 for p in range(1,2):  # Принтеры этикеток 600dpi
     url = f"https://600dpi.com.ua/printery-etiketok/brand-bixolon-or-godex-or-hprt"
@@ -1934,7 +3471,6 @@ for p in range(1,2):  # Принтеры этикеток 600dpi
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -1954,7 +3490,81 @@ for p in range(1,2):  # Принтеры этикеток 600dpi
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 for p in range(1,2): # Счетчики банкнот 600dpi 
     url = f"https://600dpi.com.ua/schetchiki-banknot/brand-nrj"
     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
@@ -2023,7 +3633,6 @@ for p in range(1,2): # Счетчики банкнот 600dpi
             d  = remaining_name
         dpi = dpi.replace("(", "")
         index = remaining_name.find(")")
-        remaining_name = remaining_name[:index] + remaining_name[index + 1:]
         try:
                 if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -2043,7 +3652,81 @@ for p in range(1,2): # Счетчики банкнот 600dpi
         dpi = "".join(digits)
         # Объединить буквы в строку
         tp = "".join(letters)
-        data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
     
     # Товари torgsoft
 torgsoft = [
@@ -2113,7 +3796,6 @@ for url in torgsoft:
         d  = remaining_name
     dpi = dpi.replace("(", "")
     index = remaining_name.find(")")
-    remaining_name = remaining_name[:index] + remaining_name[index + 1:]
     try:
             if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -2133,7 +3815,81 @@ for url in torgsoft:
     dpi = "".join(digits)
     tp = "".join(letters)
     ac_price = ''
-    data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
+    if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+        remaining_name = remaining_name[1:]
+    if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+        remaining_name = remaining_name[:-1]
+    cyrillic_text = ""
+    remaining_name = remaining_name.replace('+',',')
+    found_cyrillic = False
+    for char in remaining_name:
+        if ord(char) >= 1040 and ord(char) <= 1103:
+            found_cyrillic = True
+            cyrillic_text += char
+        elif found_cyrillic:
+            cyrillic_text += char
+    if cyrillic_text:
+        print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+    else:
+        print("Кириллица не найдена.")
+    for item in remaining_name:
+        if(item == ',' or item == ' '):
+            pass
+        elif item in cyrillic_text:
+            remaining_name = remaining_name.replace(item, '')
+    remaining_name = remaining_name.replace('+',',')
+    if mod == '':
+        break
+    reefCode = ''
+    par = cyrillic_text.split('(')
+    p =''
+    try:
+        reefCode = par[1]
+        cyrillic_text = par[0]
+    except:
+        pass
+    try:
+        if remaining_name[0].isdigit():
+            reefCode = remaining_name
+            remaining_name = '' 
+    except:
+        pass
+    foundCode = False
+    for ch in remaining_name:
+        if(ch == '('):
+            foundCode = True
+            reefCode += ch
+        elif foundCode:
+            if ch.isdigit():
+                p = remaining_name.split('(')
+                reefCode += ch
+            else :
+                foundCode = False
+    try:
+        reefCode = p[1]
+        remaining_name = p[0]
+    except:
+        pass
+    remaining_name = remaining_name.upper()
+    ZebraCod = ''
+    for byk in remaining_name:
+        if byk == 'Z':
+            Zeb = remaining_name.split('Z')
+            remaining_name = Zeb[0]
+            try:   
+                ZebraCod ='Z'+ Zeb[1]
+            except:
+                pass
+    data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod or 0,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
     # Товари Гиперцентр
 gipercentrKIEV = [
     'https://gipercenter.kiev.ua/ua/p1414283734-printer-etiketok-godex.html',
@@ -2192,9 +3948,9 @@ for url in gipercentrKIEV:
             try:
                 price =  soup.find('span', class_="Text__ui_text_size_xs--GXoZP Text__ui_text_decoration_line-through--lN0mm").text.strip()   
             except:
-                 break
+                break
         ac_price = soup.find('span',class_="Text__ui_text_size_x7l--cgh_a").text.strip()
-      
+    
     name_link = soup.find('h1',class_="Text__ui_text_size_xl--hiLG7 Text__ui_text_line-height_m--I9dbv Text__ui_text_font-weight_bold--qRTru")
     name = name_link.text.strip()  
     for key in keywords:
@@ -2240,7 +3996,6 @@ for url in gipercentrKIEV:
         d  = remaining_name
     dpi = dpi.replace("(", "")
     index = remaining_name.find(")")
-    remaining_name = remaining_name[:index] + remaining_name[index + 1:]
     try:
             if remaining_name[0] == ",":
                 # Удалить первый символ
@@ -2259,8 +4014,83 @@ for url in gipercentrKIEV:
     letters = re.findall(r"[a-zA-Z]", dpi)
     dpi = "".join(digits)
     tp = "".join(letters)
-    data.append([kategoria,marka,mod,tp,dpi, remaining_name, price, ac_price, s_name])
-header = ['Kategoria','marka','model','TP',"dpi", 'name', 'price', 'sale', 'firm'] 
+    if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+        remaining_name = remaining_name[1:]
+    if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+        remaining_name = remaining_name[:-1]
+    cyrillic_text = ""
+    remaining_name = remaining_name.replace('+',',')
+    found_cyrillic = False
+    for char in remaining_name:
+        if ord(char) >= 1040 and ord(char) <= 1103:
+            found_cyrillic = True
+            cyrillic_text += char
+        elif found_cyrillic:
+            cyrillic_text += char
+    if cyrillic_text:
+        print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+    else:
+        print("Кириллица не найдена.")
+    for item in remaining_name:
+        if(item == ',' or item == ' '):
+            pass
+        elif item in cyrillic_text:
+            remaining_name = remaining_name.replace(item, '')
+    remaining_name = remaining_name.replace('+',',')
+    if mod == '':
+        break
+    reefCode = ''
+    par = cyrillic_text.split('(')
+    p =''
+    try:
+        reefCode = par[1]
+        cyrillic_text = par[0]
+    except:
+        pass
+    try:
+        if remaining_name[0].isdigit():
+            reefCode = remaining_name
+            remaining_name = '' 
+    except:
+        pass
+    foundCode = False
+    for ch in remaining_name:
+        if(ch == '('):
+            foundCode = True
+            reefCode += ch
+        elif foundCode:
+            if ch.isdigit():
+                p = remaining_name.split('(')
+                reefCode += ch
+            else :
+                foundCode = False
+    try:
+        reefCode = p[1]
+        remaining_name = p[0]
+    except:
+        pass
+    
+    remaining_name = remaining_name.upper()
+    ZebraCod = ''
+    for byk in remaining_name:
+        if byk == 'Z':
+            Zeb = remaining_name.split('Z')
+            remaining_name = Zeb[0]
+            try:   
+                ZebraCod ='Z'+ Zeb[1]
+            except:
+                pass
+    data.append([kategoria,  # Use empty string if kategoria is None
+        marka,
+        mod ,
+        tp or 0,
+        dpi or 0,
+        remaining_name or 0,
+        cyrillic_text,  reefCode, ZebraCod,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
+header = ['Kategoria','marka','model','TP',"dpi", 'name','cyrillic_text','reefCode','ZebraCod', 'price', 'sale', 'firm'] 
 df = pd.DataFrame(data, columns=header)
 workbook = openpyxl.Workbook()                      
 worksheet = workbook.active
