@@ -14,7 +14,16 @@ keywords = ["Принтер етикеток і чеків", "Принтер е�
             'Принтер пластикових карток', 'Сортировщик банкнот','Термопринтер мобильный принтер чеков','Настольный принтер чеков/этикеток']
 firm = ["Godex","Zebra", "NRJ", "HPRT", 'BIXOLON']
 data = []
+USB_K = ['USB','u']
+USBHOST_K = ['USB-HOST', 'USB HOST','USB-HOST']
+Bt_K = ['BT', 'BLUETOOTH']
+ETHERNET_K = ['ETHERNET', 'E']
+data = []
+serial_K = ['SERIAL', 'RS232', 'US']
+wifi_K = ['WIFI', 'WI-FI', 'WI FI']
 c=0
+DT2X = ['/ DT2X']
+Vuniat = ['CG', 'COG', 'COSK', 'ESK', 'COEK', 'DT41', 'ESK', 'DT', 'TT', 'WKL', 'WK', 'BK', 'PPTII-A', 'POS80FE', 'POS80G', 'COESK', 'G']
 start_time = time.time()
 for p in range(1, 5):
     # Обладнання для друку етикеток Reef 
@@ -27,6 +36,8 @@ for p in range(1, 5):
     for element in product_elements:
         name_link = element.find('a', class_="product-title")
         name = name_link.text.strip()
+        link = element.find('a', class_="product-title").get('href')
+
         for key in keywords:
             if key.lower() in name.lower():
                 kategoria = key
@@ -157,13 +168,110 @@ for p in range(1, 5):
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+                
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,/+()]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT, link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -176,6 +284,8 @@ for p in range(1, 3): #Обладнання для друку чеків Reef
     product_elements = soup.find_all('div', class_="product w-shipping")
     for element in product_elements:
         name_link = element.find('a', class_="product-title")
+        link = element.find('a', class_="product-title").get('href')
+
         name = name_link.text.strip()
         for key in keywords:           
             if key.lower() in name.lower():
@@ -310,13 +420,110 @@ for p in range(1, 3): #Обладнання для друку чеків Reef
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+                
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT, link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -330,6 +537,8 @@ for p in range(1, 2): #Банківське обладнання Reef
     for element in product_elements:
         name_link = element.find('a', class_="product-title")
         name = name_link.text.strip()
+        link = element.find('a', class_="product-title").get('href')
+
         if name == 'Акумуляторна батарея для детектора валют NRJ':
             break
         for key in keywords:
@@ -464,13 +673,109 @@ for p in range(1, 2): #Банківське обладнання Reef
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+                
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT'       
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break     
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT, link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -492,6 +797,8 @@ for p in range(1,4): # ПРИНТЕРИ ЕТИКЕТОК  Brain
         else:  # No match found, set category to empty
                 kategoria = ""
         split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
+        link = 'https://brain.com.ua' + element.find('h3', class_="category-product-name").find('a').get('href')
+
         if len(split_name) > 1:
             remaining_name = split_name[1].strip()
         else:
@@ -611,13 +918,110 @@ for p in range(1,4): # ПРИНТЕРИ ЕТИКЕТОК  Brain
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+                
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT'
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod ,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -642,6 +1046,8 @@ for p in range(1,2):    # ДЕТЕКТОРИ ВАЛЮТ Brain
         else:
             remaining_name = name
         markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
+        link = 'https://brain.com.ua' + element.find('h3', class_="category-product-name").find('a').get('href')
+
         if len(markat) > 1:
             remaining_name = markat[1].strip()
         else:      
@@ -755,13 +1161,110 @@ for p in range(1,2):    # ДЕТЕКТОРИ ВАЛЮТ Brain
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+                
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT'                
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -797,6 +1300,8 @@ for p in range(1,2): # ПРИНТЕРИ ЧЕКІВ Brain
                 break  # Exit the loop after finding a match
             else:  # No match found, set category to empty
                 marka = ""
+        link = 'https://brain.com.ua' + element.find('h3', class_="category-product-name").find('a').get('href')
+
         s_name = 'brain'
         pattern = r"(?:код товару:\s+)(.*)"
         remaining_name = re.sub(pattern, "", remaining_name)
@@ -899,13 +1404,109 @@ for p in range(1,2): # ПРИНТЕРИ ЧЕКІВ Brain
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT'
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT, link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -916,6 +1517,8 @@ for p in range(1,2):  # Принтери етикеток Rozetka
     soup = BeautifulSoup(r.text, 'lxml')
     n_elemnts = soup.findAll('li',class_="catalog-grid__cell catalog-grid__cell_type_slim ng-star-inserted")
     for element in n_elemnts:
+        link = element.find('a').get('href')
+
         try:
             name = element.find('span', class_="goods-tile__title").text.strip()
         except:
@@ -1059,13 +1662,109 @@ for p in range(1,2):  # Принтери етикеток Rozetka
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT'
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -1075,6 +1774,8 @@ for p in range(1,2):  #Лічильники банкнот і детектори
     soup = BeautifulSoup(r.text, 'lxml')
     n_elemnts = soup.findAll('li',class_="catalog-grid__cell catalog-grid__cell_type_slim ng-star-inserted")
     for element in n_elemnts:
+        link = element.find('a').get('href')
+
         try:
             name = element.find('span', class_="goods-tile__title").text.strip()
         except:
@@ -1221,13 +1922,109 @@ for p in range(1,2):  #Лічильники банкнот і детектори
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT'
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -1237,6 +2034,8 @@ for p in range(1,2):   # POS-принтери Rozetka
     soup = BeautifulSoup(r.text, 'lxml')
     n_elemnts = soup.findAll('li',class_="catalog-grid__cell catalog-grid__cell_type_slim ng-star-inserted")
     for element in n_elemnts:
+        link = element.find('a').get('href')
+
         try:
             name = element.find('span', class_="goods-tile__title").text.strip()
         except:
@@ -1380,13 +2179,110 @@ for p in range(1,2):   # POS-принтери Rozetka
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+                
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT'
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -1399,6 +2295,7 @@ for p in range(1,3) :   #  Принтери етикеток Epicentr
     soup = BeautifulSoup(r.text, 'lxml')
     n_elemnts =soup.findAll('div', class_="card__info")
     for element in n_elemnts:
+        link = element.find('div', class_="card__name").find('h2').find('a').get('href')
         try:
             price = element.find('span',class_="card__price-sum").text.strip()
         except:
@@ -1540,13 +2437,110 @@ for p in range(1,3) :   #  Принтери етикеток Epicentr
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+                
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT'
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -1556,6 +2550,8 @@ for p in range(1,2):    #   Принтери чеків Epicentr
     soup = BeautifulSoup(r.text, 'lxml')
     n_elemnts =soup.findAll('div', class_="card__info")
     for element in n_elemnts:
+        link = element.find('div', class_="card__name").find('h2').find('a').get('href')
+
         try:
             price = element.find('span',class_="card__price-sum").text.strip()
         except:
@@ -1698,13 +2694,109 @@ for p in range(1,2):    #   Принтери чеків Epicentr
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -1715,6 +2807,8 @@ for p in range(1,2):    # Детектори валют Epicentr
     soup = BeautifulSoup(r.text, 'lxml')
     n_elemnts =soup.findAll('div', class_="card__info")
     for element in n_elemnts:
+        link = element.find('div', class_="card__name").find('h2').find('a').get('href')
+
         try:
             price = element.find('span',class_="card__price-sum").text.strip()
         except:
@@ -1856,13 +2950,109 @@ for p in range(1,2):    # Детектори валют Epicentr
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -1951,6 +3141,7 @@ megapos = [
 for url in megapos:
     price =''
     ac_price =''
+    link = url
     try:
         response = requests.get(url, timeout=20, headers={'User-agent': 'your bot 0.1'})
         response.raise_for_status()  
@@ -2101,16 +3292,113 @@ for url in megapos:
                 ZebraCod ='Z'+ Zeb[1]
             except:
                 pass
-    data.append([kategoria,  # Use empty string if kategoria is None
-        marka,
-        mod or 0,
-        tp or 0,
-        dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
-        price or 0,
-        ac_price or 0,
-        s_name or 0 ])
+            
+    USB = ''
+    USBHOST = ''
+    BT = ''
+    ETHERNET = ''
+    serial = ''
+    wifi = ''
+    remaining_name = remaining_name.upper()
+    words = re.split(r"[ ,]", remaining_name)
+    for word in words:
+        if word.startswith('UV'):
+            pass
+        else:
+            if word.startswith('U'):
+                for key in USB_K:
+                    if key.upper() in remaining_name.upper():
+                        USB = 'USB'
+                        break  
+    for word in words:
+        if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+            for key in USBHOST_K:
+                if key.upper() in remaining_name.upper():
+                    USBHOST = 'USB-HOST'
+                    break 
+    for word in words:
+        if word.startswith('B'):
+            for key in Bt_K:
+                if key.upper() in remaining_name.upper():
+                    BT = 'BLUETOOTH'
+                    break  
+    for word in words:
+        if word.startswith('E') or word.upper() == 'UES' :
+            for key in ETHERNET_K:
+                if key.upper() in remaining_name.upper():
+                    ETHERNET = 'ETHERNET'
+                    break
+    for word in words:
+        if word.startswith('S') or word.startswith('R'):
+            for key in serial_K:
+                if key.upper() in remaining_name.upper():
+                    serial = 'SERIAL'
+                    break
+        elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+            serial = 'SERIAL'
+            break  
+    for word in words:
+        if word.startswith('W'):
+            for key in wifi_K:
+                if key.upper() in remaining_name.upper():
+                    wifi = 'Wi-Fi'
+                    break
+    Liner = ''
+    for word in words:
+        if word.upper() == 'PLUS':
+            mod = mod + " " + 'PLUS'
+    for word in words:
+        if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+            Liner = 'LINER LESS'
+            break
+    for word in words:
+        if word.startswith('DT2X') :
+            mod = mod + '/DT2X'
+            break
+    lpt = ''
+    for word in words:
+        if word == 'LPT':
+            lpt = 'LPT'
+            break
+    rtc = ''
+    for word in words:
+        if word == 'RTC':
+            rtc = 'RTC'
+            break   
+    UV = ''
+    MG = ''
+    IR = ''
+    BAT = ''
+    wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+    for word in wordssssss:
+        if word == 'UV':
+            UV = 'UV'
+            
+        elif word == 'MG':
+            MG = 'MG'
+            
+        elif word == 'IR':
+            IR = 'IR'
+            
+        elif word == 'BAT':
+            BAT = 'BAT' 
+    for word in wordssssss:
+        if word.upper() in Vuniat:
+            index = Vuniat.index(word.upper())
+            matched_key = Vuniat[index]
+            mod += "/" + matched_key
+            break
+    reefCode = reefCode.replace('(', '')
+    data.append([kategoria,# Use empty string if kategoria is None
+    marka,
+    mod or 0,
+    dpi or 0,
+    
+    cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
+    price or 0,
+    ac_price or 0,
+    s_name or 0 ])
 # Товари technologic
 technologic = [
     'https://technologic.ua/cat/nastolnye-printery-etiketok/filter-brands-is-godex-taiwan-or-hprt/',
@@ -2132,6 +3420,7 @@ for url in technologic:
         ac_price = ''
         n_elemnts = soup.findAll('div', class_="product-card")
         for element in n_elemnts:
+            link = 'https://technologic.ua' + element.find('h3', class_="product-card--name").find('a').get('href')
             try:
                 name = element.find('h3', class_="product-card--name").text.strip()
             except:
@@ -2263,13 +3552,109 @@ for url in technologic:
                         ZebraCod ='Z'+ Zeb[1]
                     except:
                         pass
-            data.append([kategoria,  # Use empty string if kategoria is None
+                    
+            USB = ''
+            USBHOST = ''
+            BT = ''
+            ETHERNET = ''
+            serial = ''
+            wifi = ''
+            remaining_name = remaining_name.upper()
+            words = re.split(r"[ ,]", remaining_name)
+            for word in words:
+                if word.startswith('UV'):
+                    pass
+                else:
+                    if word.startswith('U'):
+                        for key in USB_K:
+                            if key.upper() in remaining_name.upper() and word != 'UV':
+                                USB = 'USB'
+                                break  
+            for word in words:
+                if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                    for key in USBHOST_K:
+                        if key.upper() in remaining_name.upper():
+                            USBHOST = 'USB-HOST'
+                            break 
+            for word in words:
+                if word.startswith('B'):
+                    for key in Bt_K:
+                        if key.upper() in remaining_name.upper():
+                            BT = 'BLUETOOTH'
+                            break  
+            for word in words:
+                if word.startswith('E') or word.upper() == 'UES' :
+                    for key in ETHERNET_K:
+                        if key.upper() in remaining_name.upper():
+                            ETHERNET = 'ETHERNET'
+                            break
+            for word in words:
+                if word.startswith('S') or word.startswith('R'):
+                    for key in serial_K:
+                        if key.upper() in remaining_name.upper():
+                            serial = 'SERIAL'
+                            break
+                elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                    serial = 'SERIAL'
+                    break  
+            for word in words:
+                if word.startswith('W'):
+                    for key in wifi_K:
+                        if key.upper() in remaining_name.upper():
+                            wifi = 'Wi-Fi'
+                            break
+            Liner = ''
+            for word in words:
+                if word.upper() == 'PLUS':
+                    mod = mod + " " + 'PLUS'
+            for word in words:
+                if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                    Liner = 'LINER LESS'
+                    break
+            for word in words:
+                if word.startswith('DT2X') :
+                    mod = mod + '/DT2X'
+                    break
+            lpt = ''
+            for word in words:
+                if word == 'LPT':
+                    lpt = 'LPT'
+                    break
+            rtc = ''
+            for word in words:
+                if word == 'RTC':
+                    rtc = 'RTC'
+                    break   
+            UV = ''
+            MG = ''
+            IR = ''
+            BAT = ''
+            wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+            for word in wordssssss:
+                if word == 'UV':
+                    UV = 'UV'
+                    
+                elif word == 'MG':
+                    MG = 'MG'
+                    
+                elif word == 'IR':
+                    IR = 'IR'
+                    
+                elif word == 'BAT':
+                    BAT = 'BAT' 
+            for word in wordssssss:
+                if word.upper() in Vuniat:
+                    joined_Vuniat = ''.join(Vuniat)
+                    mod += "/" + joined_Vuniat
+                    break
+            reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
             marka,
             mod or 0,
-            tp or 0,
-            dpi or 0,
-            remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+                dpi or 0,
+            
+            cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
             price or 0,
             ac_price or 0,
             s_name or 0 ])
@@ -2313,165 +3698,265 @@ fornit = [
     'https://fornit.com.ua/prynter-chekiv-hprt-ppt2-a/',
     'https://fornit.com.ua/prynter-chekiv-hprt-tp80k/'
 ]
-# for p in range(1,4):    #   Товари fornit
+for p in range(1,4):    #   Товари fornit
     
-#     url = f"https://fornit.com.ua/katalog/filter/brand=95,96,99,160;page={p};price=1150-445000/"
-#     r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
-#     soup = BeautifulSoup(r.text, 'lxml')
-#     ac_price = ''
-#     n_elemnts = soup.findAll('li', class_="catalog-grid__item")
-#     for element in n_elemnts:
-#         try:
-#             name = element.find('div', class_="catalogCard-title").text.strip()
-#         except:
-#             name='-'
-#         try:
-#             price = element.find('div', class_="catalogCard-oldPrice").text.strip()
-#         except:
-#             price = element.find('div', class_="catalogCard-price").text.strip()
-#         try:
-#             ac_price = element.find('div', class_="catalogCard-price").text.strip()
-#         except:
-#             ac_price =''
-#         if ac_price == price:
-#             ac_price =''
-#         for key in keywords:
-#             if key.lower() in name.lower():
-#                 kategoria = key
-#                 break  # Exit the loop after finding a match
-#         else:  # No match found, set category to empty
-#             kategoria = ""
-#         split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
-#         if len(split_name) > 1:
-#             remaining_name = split_name[1].strip()
-#         else:
-#             remaining_name = name
-#         markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
-#         if len(markat) > 1:
-#             remaining_name = markat[1].strip()
-#         else:      
-#             marka = remaining_name
-#         for key in firm:
-#             if key.lower() in name.lower():
-#                 marka = key
-#                 break  # Exit the loop after finding a match
-#             else:  # No match found, set category to empty
-#                 marka = ""
-#         s_name = 'fornit'
-#         parts = remaining_name.split(" ")
-#         mod = parts[0]
-#         if remaining_name == mod:
-#             remaining_name 
-#         l1 = remaining_name.split()
-#         remaining_name = " ".join(l1[1:])
-#         dpi = ""
-#         try:
-#             # Разделить строку по "dpi"
-#             parts = remaining_name.lower().split("dpi")
-#                 # Извлечь все после dpi
-#             remaining_name = parts[1].strip()  # Удаление пробелов
-#                 # Извлечь все до dpi и сам dpi
-#             dpi = parts[0] 
-#         except:
-#             d  = remaining_name
-#         dpi = dpi.replace("(", "")
-#         index = remaining_name.find(")")
-#         try:
-#                 if remaining_name[0] == ",":
-#                 # Удалить первый символ
-#                     remaining_name = remaining_name[1:]
-#         except:
-#             d = remaining_name
-#         remaining_name = remaining_name.strip()
-#         numbers = re.findall(r"\d+", price)
-#         price = "".join(numbers)
-#         numbers1 = re.findall(r"\d+", ac_price)
-#         ac_price = "".join(numbers1)
-#             # Найти все цифры
-#         digits = re.findall(r"\d+", dpi)
-#         # Найти все буквы
-#         letters = re.findall(r"[a-zA-Z]", dpi)
-#         # Объединить цифры в строку
-#         dpi = "".join(digits)
-#         # Объединить буквы в строку
-#         tp = "".join(letters)
-#         if mod == '-7200':
-#             mod = 'AL-7200'
-#         if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
-#             remaining_name = remaining_name[1:]
-#         if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
-#             remaining_name = remaining_name[:-1]
-            # cyrillic_text = ""
-            # remaining_name = remaining_name.replace('+',',')
-            # found_cyrillic = False
-            # for char in remaining_name:
-            #     if ord(char) >= 1040 and ord(char) <= 1103:
-            #         found_cyrillic = True
-            #         cyrillic_text += char
-            #     elif found_cyrillic:
-            #         cyrillic_text += char
-            # if cyrillic_text:
-            #     print(cyrillic_text)  # Выводит текст после первого символа кириллицы
-            # else:
-            #     print("Кириллица не найдена.")
-            # for item in remaining_name:
-            #     if(item == ',' or item == ' '):
-            #         pass
-            #     elif item in cyrillic_text:
-            #         remaining_name = remaining_name.replace(item, '')
-            # remaining_name = remaining_name.replace('+',',')
-#         if mod == '':
-#             break
-        # reefCode = ''
-        # par = cyrillic_text.split('(')
-        # p =''
-        # try:
-        #     reefCode = par[1]
-        #     cyrillic_text = par[0]
-        # except:
-        #     pass
-        # try:
-        #     if remaining_name[0].isdigit():
-        #         reefCode = remaining_name
-        #         remaining_name = '' 
-        # except:
-        #     pass
-        # foundCode = False
-        # for ch in remaining_name:
-        #     if(ch == '('):
-        #         foundCode = True
-        #         reefCode += ch
-        #     elif foundCode:
-        #         if ch.isdigit():
-        #             p = remaining_name.split('(')
-        #             reefCode += ch
-        #         else :
-        #             foundCode = False
-        # try:
-        #     reefCode = p[1]
-        #     remaining_name = p[0]
-        # except:
-        #     pass
-        # remaining_name = remaining_name.upper()
-        # ZebraCod = ''
-        # for byk in remaining_name:
-        #     if byk == 'Z':
-        #         Zeb = remaining_name.split('Z')
-        #         remaining_name = Zeb[0]
-        #         try:   
-        #           ZebraCod ='Z'+ Zeb[1]
-        #         except:
-        #             pass
-#         data.append([kategoria,  # Use empty string if kategoria is None
-#         marka,
-#         mod or 0,
-#         tp or 0,
-#         dpi or 0,
-#         remaining_name or 0,
-        # cyrillic_text,  reefCode, ZebraCod,
-#         price or 0,
-#         ac_price or 0,
-#         s_name or 0 ])
+    url = f"https://fornit.com.ua/katalog/filter/brand=95,96,99,160;page={p};price=1150-445000/"
+    r = requests.get(url, timeout=20, headers = {'User-agent': 'your bot 0.1'})
+    soup = BeautifulSoup(r.text, 'lxml')
+    ac_price = ''
+    n_elemnts = soup.findAll('li', class_="catalog-grid__item")
+    for element in n_elemnts:
+        link = 'https://fornit.com.ua' +  element.find('div', class_="catalogCard-title").find('a').get('href')
+
+        try:
+            name = element.find('div', class_="catalogCard-title").text.strip()
+        except:
+            name='-'
+        try:
+            price = element.find('div', class_="catalogCard-oldPrice").text.strip()
+        except:
+            price = element.find('div', class_="catalogCard-price").text.strip()
+        try:
+            ac_price = element.find('div', class_="catalogCard-price").text.strip()
+        except:
+            ac_price =''
+        if ac_price == price:
+            ac_price =''
+        for key in keywords:
+            if key.lower() in name.lower():
+                kategoria = key
+                break  # Exit the loop after finding a match
+        else:  # No match found, set category to empty
+            kategoria = ""
+        split_name = split(r"(?:{})".format("|".join(keywords)), name, flags=re.IGNORECASE)
+        if len(split_name) > 1:
+            remaining_name = split_name[1].strip()
+        else:
+            remaining_name = name
+        markat = split(r"(?:{})".format("|".join(firm)), remaining_name, flags=re.IGNORECASE)
+        if len(markat) > 1:
+            remaining_name = markat[1].strip()
+        else:      
+            marka = remaining_name
+        for key in firm:
+            if key.lower() in name.lower():
+                marka = key
+                break  # Exit the loop after finding a match
+            else:  # No match found, set category to empty
+                marka = ""
+        s_name = 'fornit'
+        parts = remaining_name.split(" ")
+        mod = parts[0]
+        if remaining_name == mod:
+            remaining_name 
+        l1 = remaining_name.split()
+        remaining_name = " ".join(l1[1:])
+        dpi = ""
+        try:
+            # Разделить строку по "dpi"
+            parts = remaining_name.lower().split("dpi")
+                # Извлечь все после dpi
+            remaining_name = parts[1].strip()  # Удаление пробелов
+                # Извлечь все до dpi и сам dpi
+            dpi = parts[0] 
+        except:
+            d  = remaining_name
+        dpi = dpi.replace("(", "")
+        index = remaining_name.find(")")
+        try:
+                if remaining_name[0] == ",":
+                # Удалить первый символ
+                    remaining_name = remaining_name[1:]
+        except:
+            d = remaining_name
+        remaining_name = remaining_name.strip()
+        numbers = re.findall(r"\d+", price)
+        price = "".join(numbers)
+        numbers1 = re.findall(r"\d+", ac_price)
+        ac_price = "".join(numbers1)
+            # Найти все цифры
+        digits = re.findall(r"\d+", dpi)
+        # Найти все буквы
+        letters = re.findall(r"[a-zA-Z]", dpi)
+        # Объединить цифры в строку
+        dpi = "".join(digits)
+        # Объединить буквы в строку
+        tp = "".join(letters)
+        if mod == '-7200':
+            mod = 'AL-7200'
+        if len(remaining_name) > 0 and (remaining_name[0] == '(' or remaining_name[0] == ')'):
+            remaining_name = remaining_name[1:]
+        if len(remaining_name) > 0 and (remaining_name[-1] == '(' or remaining_name[-1] == ')'):
+            remaining_name = remaining_name[:-1]
+        cyrillic_text = ""
+        remaining_name = remaining_name.replace('+',',')
+        found_cyrillic = False
+        for char in remaining_name:
+            if ord(char) >= 1040 and ord(char) <= 1103:
+                found_cyrillic = True
+                cyrillic_text += char
+            elif found_cyrillic:
+                cyrillic_text += char
+        if cyrillic_text:
+            print(cyrillic_text)  # Выводит текст после первого символа кириллицы
+        else:
+            print("Кириллица не найдена.")
+        for item in remaining_name:
+            if(item == ',' or item == ' '):
+                pass
+            elif item in cyrillic_text:
+                remaining_name = remaining_name.replace(item, '')
+        remaining_name = remaining_name.replace('+',',')
+        if mod == '':
+            break
+        reefCode = ''
+        par = cyrillic_text.split('(')
+        p =''
+        try:
+            reefCode = par[1]
+            cyrillic_text = par[0]
+        except:
+            pass
+        try:
+            if remaining_name[0].isdigit():
+                reefCode = remaining_name
+                remaining_name = '' 
+        except:
+            pass
+        foundCode = False
+        for ch in remaining_name:
+            if(ch == '('):
+                foundCode = True
+                reefCode += ch
+            elif foundCode:
+                if ch.isdigit():
+                    p = remaining_name.split('(')
+                    reefCode += ch
+                else :
+                    foundCode = False
+        try:
+            reefCode = p[1]
+            remaining_name = p[0]
+        except:
+            pass
+        remaining_name = remaining_name.upper()
+        ZebraCod = ''
+        for byk in remaining_name:
+            if byk == 'Z':
+                Zeb = remaining_name.split('Z')
+                remaining_name = Zeb[0]
+                try:   
+                  ZebraCod ='Z'+ Zeb[1]
+                except:
+                    pass
+        
+        
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,+()]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' and word != 'UV':
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
+        marka,
+        mod or 0,
+         dpi or 0,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
+        price or 0,
+        ac_price or 0,
+        s_name or 0 ])
 print('m')
 for p in range(1,2):  # Настольные принтеры этикеток postorg
     url = f"https://postorg.com.ua/category/nastolnye/?proizvoditel%5B%5D=233&proizvoditel%5B%5D=268&proizvoditel%5B%5D=275"
@@ -2480,6 +3965,7 @@ for p in range(1,2):  # Настольные принтеры этикеток p
     ac_price = ''
     n_elemnts = soup.findAll('div', class_="col-lg-12 flexdiscount-product-wrap 3")
     for element in n_elemnts:
+        link = 'https://postorg.com.ua' + element.find('div', class_="line-product-name").find('a').get('href')
         try:
             name = element.find('div', class_="line-product-name").text.strip()
         except:
@@ -2617,13 +4103,110 @@ for p in range(1,2):  # Настольные принтеры этикеток p
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+                
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -2634,6 +4217,7 @@ for p in range(1,2):  #  Принтер Чеків-етикеток этикет
     ac_price = ''
     n_elemnts = soup.findAll('div', class_="col-lg-12 flexdiscount-product-wrap 3")
     for element in n_elemnts:
+        link = 'https://postorg.com.ua' + element.find('div', class_="line-product-name").find('a').get('href')
         try:
             name = element.find('div', class_="line-product-name").text.strip()
         except:
@@ -2770,13 +4354,110 @@ for p in range(1,2):  #  Принтер Чеків-етикеток этикет
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+                
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -2787,6 +4468,7 @@ for p in range(1,2):  # Промышленный принтер этикеток
     ac_price = ''
     n_elemnts = soup.findAll('div', class_="col-lg-12 flexdiscount-product-wrap 3")
     for element in n_elemnts:
+        link = 'https://postorg.com.ua' + element.find('div', class_="line-product-name").find('a').get('href')
         try:
             name = element.find('div', class_="line-product-name").text.strip()
         except:
@@ -2923,13 +4605,109 @@ for p in range(1,2):  # Промышленный принтер этикеток
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -2940,6 +4718,7 @@ for p in range(1,2):  # Настільні принтери чеків postorg
     ac_price = ''
     n_elemnts = soup.findAll('div', class_="col-lg-12 flexdiscount-product-wrap 3")
     for element in n_elemnts:
+        link = 'https://postorg.com.ua' + element.find('div', class_="line-product-name").find('a').get('href')
         try:
             name = element.find('div', class_="line-product-name").text.strip()
         except:
@@ -3076,13 +4855,109 @@ for p in range(1,2):  # Настільні принтери чеків postorg
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -3093,6 +4968,7 @@ for p in range(1,2):  # Мобільні принтери чеків postorg
     ac_price = ''
     n_elemnts = soup.findAll('div', class_="col-lg-12 flexdiscount-product-wrap 3")
     for element in n_elemnts:
+        link = 'https://postorg.com.ua' + element.find('div', class_="line-product-name").find('a').get('href')
         try:
             name = element.find('div', class_="line-product-name").text.strip()
         except:
@@ -3229,13 +5105,109 @@ for p in range(1,2):  # Мобільні принтери чеків postorg
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -3246,6 +5218,8 @@ for p in range(1,2): # Принтеры чеков 600dpi
     ac_price = ''
     n_elemnts = soup.findAll('div', class_="col-xs-6 col-sm-6 col-md-4 col-lg-3")
     for element in n_elemnts:
+        link = element.find('div', class_="product-cut__title").find('a').get('href')
+
         try :
             Z = element.find('div', class_="unavailable hidden").text.strip()
         except:
@@ -3391,13 +5365,109 @@ for p in range(1,2): # Принтеры чеков 600dpi
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -3409,6 +5479,7 @@ for p in range(1,2):  # Принтеры этикеток 600dpi
     ac_price = ''
     n_elemnts = soup.findAll('div', class_="col-xs-6 col-sm-6 col-md-4 col-lg-3")
     for element in n_elemnts:
+        link = element.find('div', class_="product-cut__title").find('a').get('href')
         try :
             Z = element.find('div', class_="unavailable hidden").text.strip()
         except:
@@ -3555,13 +5626,109 @@ for p in range(1,2):  # Принтеры этикеток 600dpi
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -3572,6 +5739,7 @@ for p in range(1,2): # Счетчики банкнот 600dpi
     ac_price = ''
     n_elemnts = soup.findAll('div', class_="col-xs-6 col-sm-6 col-md-4 col-lg-3")
     for element in n_elemnts:
+        link = element.find('div', class_="product-cut__title").find('a').get('href')
         try :
             Z = element.find('div', class_="unavailable hidden").text.strip()
         except:
@@ -3717,13 +5885,109 @@ for p in range(1,2): # Счетчики банкнот 600dpi
                   ZebraCod ='Z'+ Zeb[1]
                 except:
                     pass
-        data.append([kategoria,  # Use empty string if kategoria is None
+        USB = ''
+        USBHOST = ''
+        BT = ''
+        ETHERNET = ''
+        serial = ''
+        wifi = ''
+        remaining_name = remaining_name.upper()
+        words = re.split(r"[ ,]", remaining_name)
+        for word in words:
+            if word.startswith('UV'):
+                pass
+            else:
+                if word.startswith('U'):
+                    for key in USB_K:
+                        if key.upper() in remaining_name.upper() and word != 'UV':
+                            USB = 'USB'
+                            break  
+        for word in words:
+            if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+                for key in USBHOST_K:
+                    if key.upper() in remaining_name.upper():
+                        USBHOST = 'USB-HOST'
+                        break 
+        for word in words:
+            if word.startswith('B'):
+                for key in Bt_K:
+                    if key.upper() in remaining_name.upper():
+                        BT = 'BLUETOOTH'
+                        break  
+        for word in words:
+            if word.startswith('E') or word.upper() == 'UES' :
+                for key in ETHERNET_K:
+                    if key.upper() in remaining_name.upper():
+                        ETHERNET = 'ETHERNET'
+                        break
+        for word in words:
+            if word.startswith('S') or word.startswith('R'):
+                for key in serial_K:
+                    if key.upper() in remaining_name.upper():
+                        serial = 'SERIAL'
+                        break
+            elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+                serial = 'SERIAL'
+                break  
+        for word in words:
+            if word.startswith('W'):
+                for key in wifi_K:
+                    if key.upper() in remaining_name.upper():
+                        wifi = 'Wi-Fi'
+                        break
+        Liner = ''
+        for word in words:
+            if word.upper() == 'PLUS':
+                mod = mod + " " + 'PLUS'
+        for word in words:
+            if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+                Liner = 'LINER LESS'
+                break
+        for word in words:
+            if word.startswith('DT2X') :
+                mod = mod + '/DT2X'
+                break
+        lpt = ''
+        for word in words:
+            if word == 'LPT':
+                lpt = 'LPT'
+                break
+        rtc = ''
+        for word in words:
+            if word == 'RTC':
+                rtc = 'RTC'
+                break   
+        UV = ''
+        MG = ''
+        IR = ''
+        BAT = ''
+        wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+        for word in wordssssss:
+            if word == 'UV':
+                UV = 'UV'
+                
+            elif word == 'MG':
+                MG = 'MG'
+                
+            elif word == 'IR':
+                IR = 'IR'
+                
+            elif word == 'BAT':
+               BAT = 'BAT' 
+        for word in wordssssss:
+            if word.upper() in Vuniat:
+                index = Vuniat.index(word.upper())
+                matched_key = Vuniat[index]
+                mod += "/" + matched_key
+                break
+        reefCode = reefCode.replace('(', '')
+        data.append([kategoria,# Use empty string if kategoria is None
         marka,
         mod or 0,
-        tp or 0,
         dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
+        
+        cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
         price or 0,
         ac_price or 0,
         s_name or 0 ])
@@ -3743,6 +6007,7 @@ for url in torgsoft:
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
         continue  
+    link = url
     soup = BeautifulSoup(response.text, 'lxml')
     try:
         price = soup.find('span', class_="full_card_new_price p_price").text.strip()   
@@ -3880,16 +6145,111 @@ for url in torgsoft:
                 ZebraCod ='Z'+ Zeb[1]
             except:
                 pass
-    data.append([kategoria,  # Use empty string if kategoria is None
-        marka,
-        mod or 0,
-        tp or 0,
-        dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
-        price or 0,
-        ac_price or 0,
-        s_name or 0 ])
+    USB = ''
+    USBHOST = ''
+    BT = ''
+    ETHERNET = ''
+    serial = ''
+    wifi = ''
+    remaining_name = remaining_name.upper()
+    words = re.split(r"[ ,]", remaining_name)
+    for word in words:
+        if word.startswith('UV'):
+            pass
+        else:
+            if word.startswith('U'):
+                for key in USB_K:
+                    if key.upper() in remaining_name.upper():
+                        USB = 'USB'
+                        break  
+    for word in words:
+        if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+            for key in USBHOST_K:
+                if key.upper() in remaining_name.upper():
+                    USBHOST = 'USB-HOST'
+                    break 
+    for word in words:
+        if word.startswith('B'):
+            for key in Bt_K:
+                if key.upper() in remaining_name.upper():
+                    BT = 'BLUETOOTH'
+                    break  
+    for word in words:
+        if word.startswith('E') or word.upper() == 'UES' :
+            for key in ETHERNET_K:
+                if key.upper() in remaining_name.upper():
+                    ETHERNET = 'ETHERNET'
+                    break
+    for word in words:
+        if word.startswith('S') or word.startswith('R'):
+            for key in serial_K:
+                if key.upper() in remaining_name.upper():
+                    serial = 'SERIAL'
+                    break
+        elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+            serial = 'SERIAL'
+            break  
+    for word in words:
+        if word.startswith('W'):
+            for key in wifi_K:
+                if key.upper() in remaining_name.upper():
+                    wifi = 'Wi-Fi'
+                    break
+    Liner = ''
+    for word in words:
+        if word.upper() == 'PLUS':
+            mod = mod + " " + 'PLUS'
+    for word in words:
+        if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+            Liner = 'LINER LESS'
+            break
+    for word in words:
+        if word.startswith('DT2X') :
+            mod = mod + '/DT2X'
+            break
+    lpt = ''
+    for word in words:
+        if word == 'LPT':
+            lpt = 'LPT'
+            break
+    rtc = ''
+    for word in words:
+        if word == 'RTC':
+            rtc = 'RTC'
+            break   
+    UV = ''
+    MG = ''
+    IR = ''
+    BAT = ''
+    wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+    for word in wordssssss:
+        if word == 'UV':
+            UV = 'UV'
+            
+        elif word == 'MG':
+            MG = 'MG'
+            
+        elif word == 'IR':
+            IR = 'IR'
+            
+        elif word == 'BAT':
+            BAT = 'BAT' 
+    for word in wordssssss:
+        if word.upper() in Vuniat:
+            index = Vuniat.index(word.upper())
+            matched_key = Vuniat[index]
+            mod += "/" + matched_key
+            break
+    reefCode = reefCode.replace('(', '')
+    data.append([kategoria,# Use empty string if kategoria is None
+    marka,
+    mod or 0,
+    dpi or 0,
+    cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET,serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT,link,
+    price or 0,
+    ac_price or 0,
+    s_name or 0 ])
     # Товари Гиперцентр
 gipercentrKIEV = [
     'https://gipercenter.kiev.ua/ua/p1414283734-printer-etiketok-godex.html',
@@ -3940,6 +6300,7 @@ for url in gipercentrKIEV:
         continue  
     soup = BeautifulSoup(response.text, 'lxml')
     price =''
+    link = url
     try:
         price = soup.find('span', class_="Text__ui_text_size_x7l--cgh_a Text__ui_text_font-weight_bold--qRTru").text.strip()   
         ac_price = ''
@@ -4080,17 +6441,113 @@ for url in gipercentrKIEV:
                 ZebraCod ='Z'+ Zeb[1]
             except:
                 pass
-    data.append([kategoria,  # Use empty string if kategoria is None
-        marka,
-        mod ,
-        tp or 0,
-        dpi or 0,
-        remaining_name or 0,
-        cyrillic_text,  reefCode, ZebraCod,
-        price or 0,
-        ac_price or 0,
-        s_name or 0 ])
-header = ['Kategoria','marka','model','TP',"dpi", 'name','cyrillic_text','reefCode','ZebraCod', 'price', 'sale', 'firm'] 
+    USB = ''
+    USBHOST = ''
+    BT = ''
+    ETHERNET = ''
+    serial = ''
+    wifi = ''
+    remaining_name = remaining_name.upper()
+    words = re.split(r"[ ,]", remaining_name)
+    for word in words:
+        if word.startswith('UV'):
+            pass
+        else:
+            if word.startswith('U'):
+                for key in USB_K:
+                    if key.upper() in remaining_name.upper():
+                        USB = 'USB'
+                        break  
+    for word in words:
+        if word.startswith('U') or word.upper() == 'UES' or word.upper() == 'USB' :
+            for key in USBHOST_K:
+                if key.upper() in remaining_name.upper():
+                    USBHOST = 'USB-HOST'
+                    break 
+    for word in words:
+        if word.startswith('B'):
+            for key in Bt_K:
+                if key.upper() in remaining_name.upper():
+                    BT = 'BLUETOOTH'
+                    break  
+    for word in words:
+        if word.startswith('E') or word.upper() == 'UES' :
+            for key in ETHERNET_K:
+                if key.upper() in remaining_name.upper():
+                    ETHERNET = 'ETHERNET'
+                    break
+    for word in words:
+        if word.startswith('S') or word.startswith('R'):
+            for key in serial_K:
+                if key.upper() in remaining_name.upper():
+                    serial = 'SERIAL'
+                    break
+        elif word.upper() == 'UES' or word.upper() == 'ERIAL' or word.upper()  == 'US':
+            serial = 'SERIAL'
+            break  
+    for word in words:
+        if word.startswith('W'):
+            for key in wifi_K:
+                if key.upper() in remaining_name.upper():
+                    wifi = 'Wi-Fi'
+                    break
+    Liner = ''
+    for word in words:
+        if word.upper() == 'PLUS':
+            mod = mod + " " + 'PLUS'
+    for word in words:
+        if word.upper() == 'LINER' or word.upper() == 'LINERLESS' or word.upper() == 'LINER LES' or word.upper() == 'LINER-LESS':
+            Liner = 'LINER LESS'
+            break
+    for word in words:
+        if word.startswith('DT2X') :
+            mod = mod + '/DT2X'
+            break
+    lpt = ''
+    for word in words:
+        if word == 'LPT':
+            lpt = 'LPT'
+            break
+    rtc = ''
+    for word in words:
+        if word == 'RTC':
+            rtc = 'RTC'
+            break   
+    UV = ''
+    MG = ''
+    IR = ''
+    BAT = ''
+    wordssssss = re.split(r"[ ,/()+]", remaining_name)
+
+    for word in wordssssss:
+        if word == 'UV':
+            UV = 'UV'
+            
+        elif word == 'MG':
+            MG = 'MG'
+            
+        elif word == 'IR':
+            IR = 'IR'
+            
+        elif word == 'BAT':
+            BAT = 'BAT' 
+    for word in wordssssss:
+        if word.upper() in Vuniat:
+            
+            index = Vuniat.index(word.upper())
+            matched_key = Vuniat[index]
+            mod += "/" + matched_key
+            break
+    reefCode = reefCode.replace('(', '')
+    data.append([kategoria,# Use empty string if kategoria is None
+    marka,
+    mod ,
+    dpi or 0,
+    cyrillic_text,  reefCode, ZebraCod, USB, USBHOST, BT, ETHERNET, serial, wifi, Liner, lpt, rtc, UV, MG, IR, BAT, link,
+    price or 0,
+    ac_price or 0,
+    s_name or 0 ])
+header = ['Kategoria','marka','model',"dpi",'cyrillic_text','reefCode','ZebraCod', 'USB','USBHOST','BLUETOOTH','ETHERNET','serial', 'Wi-Fi', 'LINER LESS' ,'lpt', 'rtc' , 'UV', 'MG', 'IR', 'BAT', 'link' , 'price', 'sale', 'firm'] 
 df = pd.DataFrame(data, columns=header)
 workbook = openpyxl.Workbook()                      
 worksheet = workbook.active
